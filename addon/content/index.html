@@ -1,134 +1,173 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title id="page-title"></title>
-  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon@0.5x.png" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap"
-    rel="stylesheet"
-  />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="page-title"></title>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="icons/favicon@0.5x.png"
+    />
     <link rel="stylesheet" href="styles/index.css" />
-</head>
-<body>
-  <div class="container">
-    <h1 id="annotation-summary-title"></h1>
+  </head>
+  <body>
+    <div class="container">
+      <h1 id="annotation-summary-title"></h1>
 
-    <!-- 顶部右侧：文件夹多选树下拉 -->
-    <div class="collections-top-right">
-      <label id="label-collection-filter"></label>
-      <div class="collections-dropdown">
-        <button id="collections-trigger" class="collections-trigger"></button>
-        <div id="collections-panel" class="collections-panel">
-          <div id="collections-tree" class="collections-tree"></div>
+      <!-- 顶部右侧：文件夹多选树下拉 -->
+      <div class="collections-top-right">
+        <label id="label-collection-filter"></label>
+        <div class="collections-dropdown">
+          <button id="collections-trigger" class="collections-trigger"></button>
+          <div id="collections-panel" class="collections-panel">
+            <div id="collections-tree" class="collections-tree"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <label for="text-search" id="label-text-search"></label>
+          <input type="text" id="text-search" placeholder="" />
+        </div>
+        <div class="control-group">
+          <label for="comment-search" id="label-comment-search"></label>
+          <input type="text" id="comment-search" placeholder="" />
+        </div>
+        <div class="control-group">
+          <label for="items-per-row" id="label-items-per-row"></label>
+          <input type="number" id="items-per-row" min="1" max="3" value="1" />
+        </div>
+
+        <!-- "每页显示数量" 下拉菜单 -->
+        <div class="control-group">
+          <label for="items-per-page" id="label-items-per-page"></label>
+          <select id="items-per-page">
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+          </select>
+        </div>
+
+        <!-- 仅保�?日期范围"下拉菜单 -->
+        <div class="control-group">
+          <label for="date-preset" id="label-date-preset"></label>
+          <select id="date-preset">
+            <option value="all" id="date-preset-all"></option>
+            <option value="1" id="date-preset-1"></option>
+            <option value="3" id="date-preset-3"></option>
+            <option value="7" id="date-preset-7"></option>
+            <option value="30" id="date-preset-30"></option>
+            <option value="365" id="date-preset-365"></option>
+          </select>
+        </div>
+      </div>
+
+      <div id="annotation-container"></div>
+      <!-- 批量添加标签 UI -->
+      <div
+        id="batch-add-tag-bar"
+        style="margin: 12px 0 0 0; display: flex; align-items: center; gap: 8px"
+      >
+        <div style="position: relative; flex: 1">
+          <input
+            id="batch-tag-input"
+            type="text"
+            placeholder="输入标签"
+            style="
+              width: 100%;
+              padding: 6px 8px;
+              border-radius: 4px;
+              border: 1px solid #ddd;
+              font-size: 0.9rem;
+            "
+            autocomplete="off"
+          />
+          <div
+            id="batch-tag-suggestions"
+            style="
+              position: absolute;
+              left: 0;
+              right: 0;
+              top: 100%;
+              background: #fff;
+              border: 1px solid #ddd;
+              border-radius: 0 0 4px 4px;
+              box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+              z-index: 10;
+              display: none;
+            "
+          ></div>
+        </div>
+        <button
+          id="batch-add-tag-btn"
+          style="
+            padding: 6px 12px;
+            border-radius: 4px;
+            background: #5680c3;
+            color: #fff;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9rem;
+          "
+        >
+          添加标签
+        </button>
+      </div>
+      <div id="display-count"></div>
+
+      <!-- 分页导航 -->
+      <div id="pagination-container">
+        <button id="prev-page"></button>
+        <span id="page-info"></span>
+        <button id="next-page"></button>
+      </div>
+
+      <div id="no-results" style="display: none"></div>
+
+      <div class="filters-container">
+        <div class="filter-group">
+          <label id="label-color-filter"></label>
+          <div class="colors-list" id="colors-list"></div>
+          <label for="color-op" id="label-color-op"></label>
+          <select id="color-op">
+            <option value="OR">OR</option>
+            <option value="AND">AND</option>
+            <option value="NOT">NOT</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label id="label-tag-filter"></label>
+          <div class="tags-list" id="tags-list"></div>
+          <label for="tag-op" id="label-tag-op"></label>
+          <select id="tag-op">
+            <option value="OR">OR</option>
+            <option value="AND">AND</option>
+            <option value="NOT">NOT</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 统计�?-->
+      <div class="stats-container">
+        <h2 id="stats-title"></h2>
+        <div class="stats-grid">
+          <div class="stats-box">
+            <h3 id="stats-color"></h3>
+            <div id="color-histogram"></div>
+          </div>
+          <div class="stats-box">
+            <h3 id="stats-tag"></h3>
+            <div id="tag-histogram"></div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="controls">
-      <div class="control-group">
-        <label for="text-search" id="label-text-search"></label>
-        <input type="text" id="text-search" placeholder="" />
-      </div>
-      <div class="control-group">
-        <label for="comment-search" id="label-comment-search"></label>
-        <input
-          type="text"
-          id="comment-search"
-          placeholder=""
-        />
-      </div>
-      <div class="control-group">
-        <label for="items-per-row" id="label-items-per-row"></label>
-        <input type="number" id="items-per-row" min="1" max="3" value="1" />
-      </div>
-
-      <!-- "每页显示数量" 下拉菜单 -->
-      <div class="control-group">
-        <label for="items-per-page" id="label-items-per-page"></label>
-        <select id="items-per-page">
-          <option value="50">50</option>
-          <option value="100">100</option>
-          <option value="200">200</option>
-        </select>
-      </div>
-
-      <!-- 仅保�?日期范围"下拉菜单 -->
-      <div class="control-group">
-        <label for="date-preset" id="label-date-preset"></label>
-        <select id="date-preset">
-          <option value="all" id="date-preset-all"></option>
-          <option value="1" id="date-preset-1"></option>
-          <option value="3" id="date-preset-3"></option>
-          <option value="7" id="date-preset-7"></option>
-          <option value="30" id="date-preset-30"></option>
-          <option value="365" id="date-preset-365"></option>
-        </select>
-      </div>
-
-    </div>
-
-    <div id="annotation-container"></div>
-    <!-- 批量添加标签 UI -->
-    <div id="batch-add-tag-bar" style="margin: 24px 0 0 0; display: flex; align-items: center; gap: 12px;">
-      <div style="position: relative; flex: 1;">
-        <input id="batch-tag-input" type="text" placeholder="输入标签" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;" autocomplete="off" />
-        <div id="batch-tag-suggestions" style="position: absolute; left: 0; right: 0; top: 100%; background: #fff; border: 1px solid #e1e5eb; border-radius: 0 0 6px 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); z-index: 10; display: none;"></div>
-      </div>
-      <button id="batch-add-tag-btn" style="padding: 10px 18px; border-radius: 6px; background: var(--secondary-color); color: #fff; border: none; font-weight: 600; cursor: pointer;">添加标签</button>
-    </div>
-    <div id="display-count"></div>
-
-    <!-- 分页导航 -->
-    <div id="pagination-container">
-      <button id="prev-page"></button>
-      <span id="page-info"></span>
-      <button id="next-page"></button>
-    </div>
-
-    <div id="no-results" style="display: none;"></div>
-
-    <div class="filters-container">
-      <div class="filter-group">
-        <label id="label-color-filter"></label>
-        <div class="colors-list" id="colors-list"></div>
-        <label for="color-op" id="label-color-op"></label>
-        <select id="color-op">
-          <option value="OR">OR</option>
-          <option value="AND">AND</option>
-          <option value="NOT">NOT</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label id="label-tag-filter"></label>
-        <div class="tags-list" id="tags-list"></div>
-        <label for="tag-op" id="label-tag-op"></label>
-        <select id="tag-op">
-          <option value="OR">OR</option>
-          <option value="AND">AND</option>
-          <option value="NOT">NOT</option>
-        </select>
-      </div>
-    </div>
-    
-    <!-- 统计�?-->
-    <div class="stats-container">
-      <h2 id="stats-title"></h2>
-      <div class="stats-grid">
-        <div class="stats-box">
-          <h3 id="stats-color"></h3>
-          <div id="color-histogram"></div>
-        </div>
-        <div class="stats-box">
-          <h3 id="stats-tag"></h3>
-          <div id="tag-histogram"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="scripts/summary-ui.js"></script>
-</body>
+    <script src="scripts/summary-ui.js"></script>
+  </body>
 </html>

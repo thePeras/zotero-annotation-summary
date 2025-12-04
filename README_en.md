@@ -35,11 +35,11 @@ A Zotero plugin that extracts and displays all highlights and notes from your li
 
   <img src="./doc/images/indexing.gif" alt="indexing" width="800">
 
-- **Color & Tag Filtering**  
-- Filter annotations by highlight color or tag. Supports 
+- **Color & Tag Filtering**
+- Filter annotations by highlight color or tag. Supports
 - NOT logic: selecting NOT plus a color or tag excludes any annotation with that color/tag.
 
-  <img src="./doc/images/filtering.gif" alt="filtering" width="800">  
+  <img src="./doc/images/filtering.gif" alt="filtering" width="800">
 
 - **Date Range Filtering**  
   Choose a preset date range, from Recent 1 Day” up to “Recent 1 Year,” or show all annotations.
@@ -59,13 +59,14 @@ Double click any annotation entry to open its corresponding item in Zotero at th
 <img src="./doc/images/hyperlink.gif" alt="hyperlink" width="800">
 
 > [!note]
+>
 > - This click-to-junp feature can jump to the annotation page with PDF items, but can only jump to the item when with epub items because epub does not have pages. Other items have not been tested.
 > - The newest Zotero 7 Beta version supports jump to annotation positions with epub.
 
 ### 5. Display Count & Statistics
 
 - **Display Count**  
-  At the bottom of the annotation list, a line shows how many annotations are currently displayed.  
+  At the bottom of the annotation list, a line shows how many annotations are currently displayed.
 
   <img src="./doc/images/displaycount.png" alt="displaycount" width="800">
 
@@ -75,9 +76,9 @@ Double click any annotation entry to open its corresponding item in Zotero at th
   <img src="./doc/images/statistics.png" alt="statistics" width="800">
 
 ### 6. delete/(batch) add tags
-- Hover the mouse onto the tags shown on the lower part of annotation items, a delete icon will show up and the tag can be deleted by a single click.
-<img src="./doc/images/deletetag.gif" alt="deletetag" width="800">
 
+- Hover the mouse onto the tags shown on the lower part of annotation items, a delete icon will show up and the tag can be deleted by a single click.
+  <img src="./doc/images/deletetag.gif" alt="deletetag" width="800">
 
 - Click the color circle on the left top of an annotation item to select it, then you can add tags to it using the input box and button below.
 - Multiple items can be select for batch addition of tags
@@ -86,13 +87,15 @@ Double click any annotation entry to open its corresponding item in Zotero at th
 
 ### 7. Dynamic UI Rendering
 
-Everything updates in real time based on the current filter state:  
-- The list of annotations  
-- Available tag and color options (including excluded items marked with a red line)  
-- Display count text  
+Everything updates in real time based on the current filter state:
+
+- The list of annotations
+- Available tag and color options (including excluded items marked with a red line)
+- Display count text
 - Histograms
 
 ### 8. Update
+
 - This plugin does not provide automatic updating feature。
 - This plugin has been included in [Zotero Plugins Collection](https://github.com/zotero-chinese/zotero-plugins), and can be automatically updated using the [zotero-addons](https://github.com/syt2/zotero-addons#readme) plugin.
 
@@ -104,5 +107,5 @@ This project is licensed under **[AGPL-3.0](https://www.gnu.org/licenses/agpl-3.
 
 ## Acknowledgments
 
-- Built on the **[Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template)**  
-- Inspired by and referencing [Chartero](https://github.com/volatile-static/Chartero) source code  
+- Built on the **[Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template)**
+- Inspired by and referencing [Chartero](https://github.com/volatile-static/Chartero) source code

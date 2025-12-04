@@ -17,10 +17,24 @@ export function decodeHtmlEntities(str) {
 
 export function sanitizeHtml(html) {
   const allowedTags = new Set([
-    "b","strong","i","em","u","sub","sup","br","span",
-    "p","ul","ol","li","code","pre","a"
+    "b",
+    "strong",
+    "i",
+    "em",
+    "u",
+    "sub",
+    "sup",
+    "br",
+    "span",
+    "p",
+    "ul",
+    "ol",
+    "li",
+    "code",
+    "pre",
+    "a",
   ]);
-  const allowedAttrs = new Set(["href","title"]);
+  const allowedAttrs = new Set(["href", "title"]);
   const container = document.createElement("div");
   container.innerHTML = decodeHtmlEntities(html || "");
   const all = container.querySelectorAll("*");
@@ -66,7 +80,7 @@ export function highlightHTML(text, query) {
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
     if (i % 2 === 1) {
-      html += '<mark class="highlight">' + escapeHTML(part) + '</mark>';
+      html += '<mark class="highlight">' + escapeHTML(part) + "</mark>";
     } else {
       html += escapeHTML(part);
     }
@@ -77,7 +91,12 @@ export function highlightHTML(text, query) {
 export function highlightInElement(rootEl, query) {
   if (!rootEl || !query) return;
   const re = new RegExp(escapeRegExp(query), "gi");
-  const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null, false);
+  const walker = document.createTreeWalker(
+    rootEl,
+    NodeFilter.SHOW_TEXT,
+    null,
+    false,
+  );
   const nodes: any[] = [];
   let n;
   while ((n = walker.nextNode())) {
@@ -102,9 +121,8 @@ export function highlightInElement(rootEl, query) {
     }
     const tail = text.slice(last);
     if (tail) frag.appendChild(document.createTextNode(tail));
-    (textNode as any).parentNode && (textNode as any).parentNode.replaceChild(frag, textNode);
+    (textNode as any).parentNode &&
+      (textNode as any).parentNode.replaceChild(frag, textNode);
     re.lastIndex = 0;
   });
 }
-
-

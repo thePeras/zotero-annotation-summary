@@ -9,20 +9,22 @@ import { getString } from "./utils/locale";
 
 const ztoolkit = createZToolkit();
 
-// —— 当 Zotero 主窗口加载完毕时，向 "工具" 菜单添加菜单项 —— 
+// —— 当 Zotero 主窗口加载完毕时，向 "工具" 菜单添加菜单项 ——
 export function onMainWindowLoad(
   win: Window,
-  extractAllAnnotations?: () => Promise<string | null>
+  extractAllAnnotations?: () => Promise<string | null>,
 ) {
   const toolsMenu = win.document.getElementById("menu_ToolsPopup");
   if (toolsMenu) {
     // "打开注释总结" 菜单项（合并"导出"+"打开"）
-    const existingOpenTabButton = win.document.getElementById(
-      "zotero-tb-open-tab"
-    );
+    const existingOpenTabButton =
+      win.document.getElementById("zotero-tb-open-tab");
     if (!existingOpenTabButton) {
       const openTabMenuItem = win.document.createXULElement("menuitem");
-      openTabMenuItem.setAttribute("label", getString("menuitem-open-annotation-summary"));
+      openTabMenuItem.setAttribute(
+        "label",
+        getString("menuitem-open-annotation-summary"),
+      );
       openTabMenuItem.setAttribute("id", "zotero-tb-open-tab");
       openTabMenuItem.addEventListener("command", async () => {
         const fileUri = await extractAllAnnotations!();
@@ -33,7 +35,7 @@ export function onMainWindowLoad(
   }
 }
 
-// —— 点击"打开注释总结"后，直接打开标签页并加载 index.html，用传入的 fileUri —— 
+// —— 点击"打开注释总结"后，直接打开标签页并加载 index.html，用传入的 fileUri ——
 export function openHelloZoteroTab(fileUri: string) {
   const Zotero_Tabs = Zotero.getMainWindow().Zotero_Tabs;
   const { container } = Zotero_Tabs.add({
@@ -43,7 +45,7 @@ export function openHelloZoteroTab(fileUri: string) {
     select: true,
     onClose: () => {
       Zotero.debug("【清理】关闭 Annotation Summary tab");
-    }
+    },
   });
 
   const encodedFileUri = encodeURIComponent(fileUri);
@@ -65,10 +67,10 @@ export function openHelloZoteroTab(fileUri: string) {
         border: "none",
       },
     },
-    container
+    container,
   );
 
-  // —— 设置当前新建标签的图标 —— 
+  // —— 设置当前新建标签的图标 ——
   try {
     const win = Zotero.getMainWindow();
     const doc = win.document as any;
@@ -79,21 +81,32 @@ export function openHelloZoteroTab(fileUri: string) {
         const iconEl: any =
           doc.querySelector('.tab[aria-selected=\"true\"] .tab-icon') ||
           doc.querySelector('.tab[selected=\"true\"] .tab-icon') ||
-          doc.querySelector('.tab[selected] .tab-icon') ||
-          doc.querySelector('.selected .tab-icon');
+          doc.querySelector(".tab[selected] .tab-icon") ||
+          doc.querySelector(".selected .tab-icon");
         if (iconEl) {
           // 同时设置 listStyleImage 与 backgroundImage 提高兼容性
-          try { iconEl.style.listStyleImage = `url(${iconUrl})`; } catch {}
-          try { iconEl.style.setProperty('background-image', `url(${iconUrl})`, 'important'); } catch {}
+          try {
+            iconEl.style.listStyleImage = `url(${iconUrl})`;
+          } catch {}
+          try {
+            iconEl.style.setProperty(
+              "background-image",
+              `url(${iconUrl})`,
+              "important",
+            );
+          } catch {}
           // 确保尺寸为 16x16
-          try { iconEl.style.width = '16px'; iconEl.style.height = '16px'; } catch {}
+          try {
+            iconEl.style.width = "16px";
+            iconEl.style.height = "16px";
+          } catch {}
         }
       } catch {}
     }, 0);
   } catch {}
 }
 
-// —— 提取所有注释，结果写入临时文件，返回 file:// URI；发生错误时返回 null —— 
+// —— 提取所有注释，结果写入临时文件，返回 file:// URI；发生错误时返回 null ——
 export async function extractAllAnnotations(): Promise<string | null> {
   const libs = await Zotero.Libraries.getAll();
   const userLib = libs.find((lib) => lib.libraryType === "user");
@@ -116,12 +129,18 @@ export async function extractAllAnnotations(): Promise<string | null> {
       let topItem: any = null;
       if (attachment?.isAttachment()) {
         pdfKey = attachment.key ?? "";
-        const parentItem = (typeof attachment.parentID === "number" || typeof attachment.parentID === "string")
-          ? await Zotero.Items.get(attachment.parentID)
-          : null;
+        const parentItem =
+          typeof attachment.parentID === "number" ||
+          typeof attachment.parentID === "string"
+            ? await Zotero.Items.get(attachment.parentID)
+            : null;
         title = parentItem?.getField("title") ?? title;
         topItem = parentItem;
-        while (topItem && typeof topItem.isTopLevelItem === "function" && !topItem.isTopLevelItem()) {
+        while (
+          topItem &&
+          typeof topItem.isTopLevelItem === "function" &&
+          !topItem.isTopLevelItem()
+        ) {
           const pid = topItem.parentID;
           if (!pid) break;
           topItem = await Zotero.Items.get(pid);
@@ -150,10 +169,18 @@ export async function extractAllAnnotations(): Promise<string | null> {
                 cursor = await Zotero.Collections.get(cursor.parentID);
                 guard++;
               }
-              segs.forEach((n) => { if (!seenNames.has(n)) { seenNames.add(n); collectionNames.push(n); } });
+              segs.forEach((n) => {
+                if (!seenNames.has(n)) {
+                  seenNames.add(n);
+                  collectionNames.push(n);
+                }
+              });
               for (let i = 0; i < segs.length; i++) {
                 const path = segs.slice(0, i + 1).join(" / ");
-                if (!seenPaths.has(path)) { seenPaths.add(path); collectionPaths.push(path); }
+                if (!seenPaths.has(path)) {
+                  seenPaths.add(path);
+                  collectionPaths.push(path);
+                }
               }
             } catch {}
           }
@@ -162,7 +189,9 @@ export async function extractAllAnnotations(): Promise<string | null> {
 
       const key = fullItem.key ?? "";
       const parentItemKey = fullItem.parentItem;
-      const uri = parentItemKey ? `zotero://open/library/items/${parentItemKey}?page=&annotation=${key}` : "";
+      const uri = parentItemKey
+        ? `zotero://open/library/items/${parentItemKey}?page=&annotation=${key}`
+        : "";
 
       result.push({
         itemID: item.itemID,
@@ -189,7 +218,9 @@ export async function extractAllAnnotations(): Promise<string | null> {
 
   try {
     const json = JSON.stringify(result, null, 2);
-    const tmpDir = (Components as any).classes["@mozilla.org/file/directory_service;1"]
+    const tmpDir = (Components as any).classes[
+      "@mozilla.org/file/directory_service;1"
+    ]
       .getService((Components as any).interfaces.nsIProperties)
       .get("TmpD", (Components as any).interfaces.nsIFile);
     const tempFile = tmpDir.clone();
