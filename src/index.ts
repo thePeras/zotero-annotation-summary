@@ -9,9 +9,7 @@ if (!basicTool.getGlobal("Zotero")[config.addonInstance]) {
   _globalThis.addon = new Addon();
 
   // ✅ 添加一行调试信息
-  Zotero.debug(
-    `[${config.addonName}] 插件已加载，实例名: ${config.addonInstance}`,
-  );
+  Zotero.debug(`[${config.addonName}] 插件已加载，实例名: ${config.addonInstance}`);
 
   defineGlobal("ztoolkit", () => {
     return _globalThis.addon.data.ztoolkit;
@@ -33,6 +31,6 @@ function defineGlobal(name: string, getter?: () => any) {
   Object.defineProperty(_globalThis, name, {
     get() {
       return getter ? getter() : basicTool.getGlobal(name);
-    },
+    }, 
   });
 }

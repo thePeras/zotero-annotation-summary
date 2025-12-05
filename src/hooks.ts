@@ -33,31 +33,18 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
   try {
     const doc: any = win.document;
     const toolbar = doc.getElementById("zotero-items-toolbar");
-    if (!toolbar || doc.getElementById("annotation-summary-toolbarbutton"))
-      return;
+    if (!toolbar || doc.getElementById("annotation-summary-toolbarbutton")) return;
 
     const template: any =
       toolbar.querySelector("#zotero-tb-add") ||
       toolbar.querySelector("#zotero-tb-note-add") ||
       toolbar.querySelector("toolbarbutton.zotero-tb-button");
 
-    const btn: any = template
-      ? template.cloneNode(true)
-      : doc.createXULElement("toolbarbutton");
+    const btn: any = template ? template.cloneNode(true) : doc.createXULElement("toolbarbutton");
     btn.setAttribute("id", "annotation-summary-toolbarbutton");
-    btn.setAttribute(
-      "tooltiptext",
-      getString("menuitem-open-annotation-summary"),
-    );
+    btn.setAttribute("tooltiptext", getString("menuitem-open-annotation-summary"));
     if (!template) btn.setAttribute("class", "zotero-tb-button");
-    [
-      "command",
-      "oncommand",
-      "onclick",
-      "onmousedown",
-      "type",
-      "wantdropmarker",
-    ].forEach((a) => btn.removeAttribute(a));
+    ["command","oncommand","onclick","onmousedown","type","wantdropmarker"].forEach((a)=>btn.removeAttribute(a));
     btn.querySelector("menupopup")?.remove();
     btn.querySelector("dropmarker")?.remove();
 
@@ -65,28 +52,17 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
     const setIcon16 = (button: any, url: string) => {
       const img = new (win as any).Image();
       img.onload = () => {
-        const c: any = win.document.createElementNS(
-          "http://www.w3.org/1999/xhtml",
-          "canvas",
-        );
+        const c: any = win.document.createElementNS("http://www.w3.org/1999/xhtml","canvas");
         c.width = c.height = 16;
         const ctx = c.getContext("2d");
         ctx?.drawImage(img, 0, 0, 16, 16);
-        (button as any).style.listStyleImage =
-          `url(${c.toDataURL("image/png")})`;
+        (button as any).style.listStyleImage = `url(${c.toDataURL("image/png")})`;
         const inner = button.querySelector("image.toolbarbutton-icon");
-        if (inner) {
-          inner.removeAttribute("type");
-          inner.setAttribute("width", "16");
-          inner.setAttribute("height", "16");
-        }
+        if (inner) { inner.removeAttribute("type"); inner.setAttribute("width","16"); inner.setAttribute("height","16"); }
       };
       img.src = url;
     };
-    setIcon16(
-      btn,
-      `chrome://${config.addonRef}/content/icons/favicon@0.5x.png`,
-    );
+    setIcon16(btn, `chrome://${config.addonRef}/content/icons/favicon@0.5x.png`);
 
     btn.addEventListener("command", async () => {
       const fileUri = await extractAllAnnotations();
@@ -109,10 +85,7 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
         lastNativeBeforeSearch = el;
       }
     }
-    if (
-      lastNativeBeforeSearch &&
-      lastNativeBeforeSearch.parentNode === toolbar
-    ) {
+    if (lastNativeBeforeSearch && lastNativeBeforeSearch.parentNode === toolbar) {
       if (lastNativeBeforeSearch.nextSibling) {
         toolbar.insertBefore(btn, lastNativeBeforeSearch.nextSibling);
       } else {
