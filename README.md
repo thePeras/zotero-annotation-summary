@@ -23,6 +23,7 @@
 ## 功能
 
 ### 1. 加载展示标注
+
 - 将从 Zotero 中的高亮标注加载并展示到一个总结页面中。
 
 <img src="./doc/images/introduction.png" alt="introduction" width="800">
@@ -56,6 +57,7 @@
 <img src="./doc/images/hyperlink.gif" alt="hyperlink" width="800">
 
 > [!note]
+>
 > - `PDF`文件可以跳转到标注位置，而`epub`文件由于没有页码，只能跳转到对应文件，其他文件并未测试。
 > - 最新的Zotero 7 Beta版本支持跳转到`epub`指定标签位置。
 
@@ -70,6 +72,7 @@
 <img src="./doc/images/statistics.png" alt="statistics" width="800">
 
 ### 6. 删除/（批量）添加标签到标注
+
 - 将鼠标移至条目下侧显示的标签上，该标签右侧会浮现删除按钮，点击即可删除该标签
 
 <img src="./doc/images/deletetag.gif" alt="deletetag" width="800">
@@ -84,6 +87,7 @@
 - 根据当前筛选状态，动态更新标注列表、可选标签，颜色面板，和数据统计。
 
 ### 8. 更新版本
+
 - 本插件未提供内置自动更新功能。
 - 本插件已被[Zotero 插件合集](https://github.com/zotero-chinese/zotero-plugins)收录，使用[zotero-addons](https://github.com/syt2/zotero-addons#readme)插件，打开自动更新可自动更新本插件。
 
