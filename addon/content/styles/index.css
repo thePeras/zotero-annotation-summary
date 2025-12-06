@@ -44,10 +44,36 @@ h2 {
   font-weight: 600;
 }
 
-/* ---------- 顶部控制区 ---------- */
-.controls {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+/* ---------- 顶部控制区 - Row 1 ---------- */
+.controls-row-1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #fafafa;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--medium-gray);
+}
+
+.controls-row-1 .controls-left {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+}
+
+.controls-row-1 .controls-right {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+
+/* ---------- 顶部控制区 - Row 2 ---------- */
+.controls-row-2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 12px;
   margin-bottom: 15px;
   padding: 12px;
@@ -56,9 +82,31 @@ h2 {
   border: 1px solid var(--medium-gray);
 }
 
+.controls-row-2 .controls-left {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+}
+
+.controls-row-2 .controls-right {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+  align-items: flex-end;
+}
+
+.filter-by-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-right: 8px;
+}
+
 .control-group {
   display: flex;
   flex-direction: column;
+  min-width: 150px;
 }
 
 .control-group label {
@@ -77,6 +125,13 @@ h2 {
   font-size: 0.9rem;
   background-color: white;
   transition: var(--transition);
+}
+
+/* Narrow the items-per-page select */
+.items-per-page-select {
+  min-width: 70px !important;
+  width: 70px !important;
+  padding: 6px 4px !important;
 }
 
 .control-group input[type="text"]:focus,
@@ -439,8 +494,14 @@ h2 {
 .colors-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  flex: 1;
+  gap: 6px;
+  align-items: center;
+}
+
+.tags-list {
+  border-left: 1px solid var(--medium-gray);
+  padding-left: 10px;
+  margin-left: 4px;
 }
 
 .tag-item {
