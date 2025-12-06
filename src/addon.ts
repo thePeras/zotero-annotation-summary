@@ -37,9 +37,7 @@ class Addon {
 
   // 插件启动时自动调用
   public async onload(): Promise<void> {
-    Zotero.debug(
-      `[${this.data.config.addonName}] 插件已加载，准备添加 Tools 菜单项`,
-    );
+    Zotero.debug(`[${this.data.config.addonName}] 插件已加载，准备添加 Tools 菜单项`);
 
     setTimeout(() => {
       try {

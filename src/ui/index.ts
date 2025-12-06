@@ -1,15 +1,8 @@
 // @ts-nocheck
-import { LOCALE, getString, fillI18nText } from "./i18n";
-import {
-  escapeHTML,
-  decodeHtmlEntities,
-  sanitizeHtml,
-  escapeRegExp,
-  highlightHTML,
-  highlightInElement,
-} from "./utils";
+import { LOCALE, getString, fillI18nText } from './i18n';
+import { escapeHTML, decodeHtmlEntities, sanitizeHtml, escapeRegExp, highlightHTML, highlightInElement } from './utils';
 
-document.addEventListener("DOMContentLoaded", fillI18nText);
+document.addEventListener('DOMContentLoaded', fillI18nText);
 
 // —— 文本安全转义与高亮 ——
 // utils imported above
@@ -29,9 +22,7 @@ const itemsPerRowInput = document.getElementById("items-per-row") as any;
 const itemsPerPageSelect = document.getElementById("items-per-page") as any;
 const datePresetSelect = document.getElementById("date-preset") as any;
 const collectionsTreeEl = document.getElementById("collections-tree") as any;
-const collectionsTrigger = document.getElementById(
-  "collections-trigger",
-) as any;
+const collectionsTrigger = document.getElementById("collections-trigger") as any;
 const collectionsPanel = document.getElementById("collections-panel") as any;
 let selectedCollectionPaths = new Set<string>();
 const tagOpSelect = document.getElementById("tag-op") as any;
@@ -40,9 +31,7 @@ const prevPageButton = document.getElementById("prev-page") as any;
 const nextPageButton = document.getElementById("next-page") as any;
 const pageInfoSpan = document.getElementById("page-info") as any;
 
-const annotationContainer = document.getElementById(
-  "annotation-container",
-) as any;
+const annotationContainer = document.getElementById("annotation-container") as any;
 const displayCountDiv = document.getElementById("display-count") as any;
 const noResultsDiv = document.getElementById("no-results") as any;
 const tagsListContainer = document.getElementById("tags-list") as any;
@@ -52,55 +41,43 @@ let selectedTags = new Set<string>();
 let selectedColors = new Set<string>();
 let selectedAnnotationIds = new Set<number>();
 
-(function ensureTagArrayHelper() {
+(function ensureTagArrayHelper(){
   // Normalize tag field which may be an array (preferred), a JSON stringified array,
   // or a legacy comma-joined string.
 })();
-function asTagArray(tags: any): string[] {
+function asTagArray(tags:any): string[] {
   if (Array.isArray(tags)) {
-    return (tags as any)
-      .filter((t: any) => typeof t === "string" && t.trim() !== "")
-      .map((t: any) => t.trim());
+    return (tags as any).filter((t:any) => typeof t === 'string' && t.trim() !== '').map((t:any) => t.trim());
   }
   if (tags == null) return [];
-  if (typeof tags === "string" && tags.trim().startsWith("[")) {
+  if (typeof tags === 'string' && tags.trim().startsWith('[')) {
     try {
       const parsed = JSON.parse(tags);
       if (Array.isArray(parsed)) {
-        return (parsed as any)
-          .filter((t: any) => typeof t === "string" && t.trim() !== "")
-          .map((t: any) => t.trim());
+        return (parsed as any).filter((t:any) => typeof t === 'string' && t.trim() !== '').map((t:any) => t.trim());
       }
     } catch {}
   }
-  return String(tags)
-    .split(",")
-    .map((t: string) => t.trim())
-    .filter(Boolean);
+  return String(tags).split(',').map((t:string) => t.trim()).filter(Boolean);
 }
 
-(function setupGlobalColorMenuCloser() {
+(function setupGlobalColorMenuCloser(){
   let bound = false;
   function closeIfOpen(e?: any) {
-    const menu = document.querySelector(".color-menu") as any;
+    const menu = document.querySelector('.color-menu') as any;
     if (!menu) return;
-    if (
-      e &&
-      (menu.contains(e.target) ||
-        (e.target && (e.target as any).closest(".annotation-color")))
-    )
-      return;
+    if (e && (menu.contains(e.target) || (e.target && (e.target as any).closest('.annotation-color')))) return;
     menu.parentNode && menu.parentNode.removeChild(menu);
   }
   if (!bound) {
     bound = true;
-    document.addEventListener("click", closeIfOpen, true);
-    document.addEventListener("scroll", closeIfOpen, true);
-    window.addEventListener("blur", closeIfOpen);
+    document.addEventListener('click', closeIfOpen, true);
+    document.addEventListener('scroll', closeIfOpen, true);
+    window.addEventListener('blur', closeIfOpen);
   }
 })();
 
-(function augmentStylesForContextMenu() {
+(function augmentStylesForContextMenu(){
   // no-op placeholder in case we later need runtime style tweaks
 })();
 
@@ -109,24 +86,17 @@ function asTagArray(tags: any): string[] {
     const params = new URLSearchParams(window.location.search);
     const encodedFile = params.get("file");
     if (encodedFile) {
-      console.log(
-        "index.html: 找到 file 参数，准备从临时文件读取…",
-        encodedFile,
-      );
+      console.log("index.html: 找到 file 参数，准备从临时文件读取…", encodedFile);
       const parentZotero = (window as any).parent?.Zotero;
       if (!parentZotero) {
-        console.warn(
-          "index.html: window.parent.Zotero 未定义，无法通过 Zotero API 读取",
-        );
+        console.warn("index.html: window.parent.Zotero 未定义，无法通过 Zotero API 读取");
       } else {
         const fileUri = decodeURIComponent(encodedFile);
         console.log("index.html: 解码后 fileUri =", fileUri);
         try {
-          const ioService = (window as any).Components.classes[
-            "@mozilla.org/network/io-service;1"
-          ].getService((window as any).Components.interfaces.nsIIOService);
-          const fileURL = ioService
-            .newURI(fileUri, null, null)
+          const ioService = (window as any).Components.classes["@mozilla.org/network/io-service;1"]
+            .getService((window as any).Components.interfaces.nsIIOService);
+          const fileURL = ioService.newURI(fileUri, null, null)
             .QueryInterface((window as any).Components.interfaces.nsIFileURL);
           const nsIFile = fileURL.file;
           const jsonStr = await parentZotero.File.getContents(nsIFile);
@@ -135,45 +105,23 @@ function asTagArray(tags: any): string[] {
             // Handle both old format (array) and new format (object with annotations and context)
             if (Array.isArray(data)) {
               annotations = data;
-              console.log(
-                "index.html: 已从临时文件加载注释（旧格式），共",
-                annotations.length,
-                "条",
-              );
+              console.log("index.html: 已从临时文件加载注释（旧格式），共", annotations.length, "条");
             } else if (data.annotations && Array.isArray(data.annotations)) {
               annotations = data.annotations;
-              console.log(
-                "index.html: 已从临时文件加载注释（新格式），共",
-                annotations.length,
-                "条",
-              );
-
+              console.log("index.html: 已从临时文件加载注释（新格式），共", annotations.length, "条");
+              
               // Apply context-based filtering
               if (data.context) {
                 // If a specific item was selected, filter to show only its annotations
                 if (data.context.selectedItemID) {
-                  console.log(
-                    "index.html: 检测到选中的项目 ID:",
-                    data.context.selectedItemID,
-                  );
-                  annotations = annotations.filter(
-                    (a: any) => a.topItemID === data.context.selectedItemID,
-                  );
-                  console.log(
-                    "index.html: 过滤后剩余",
-                    annotations.length,
-                    "条注释",
-                  );
+                  console.log("index.html: 检测到选中的项目 ID:", data.context.selectedItemID);
+                  annotations = annotations.filter((a: any) => a.topItemID === data.context.selectedItemID);
+                  console.log("index.html: 过滤后剩余", annotations.length, "条注释");
                 }
                 // If a collection was selected, pre-select it in the UI
                 else if (data.context.selectedCollectionPath) {
-                  console.log(
-                    "index.html: 检测到选中的集合路径:",
-                    data.context.selectedCollectionPath,
-                  );
-                  selectedCollectionPaths.add(
-                    data.context.selectedCollectionPath,
-                  );
+                  console.log("index.html: 检测到选中的集合路径:", data.context.selectedCollectionPath);
+                  selectedCollectionPaths.add(data.context.selectedCollectionPath);
                 }
               }
             }
@@ -248,9 +196,7 @@ function filterAnnotations() {
 
   let tagsSource = textResults;
   if (hasColorFilters) {
-    tagsSource = textResults.filter((a) =>
-      (selectedColors as any).has(a.color),
-    );
+    tagsSource = textResults.filter((a) => (selectedColors as any).has(a.color));
   }
 
   let colorsSource = textResults;
@@ -264,13 +210,9 @@ function filterAnnotations() {
         if ((selectedTags as any).has("__NO_TAG__")) return arr.length === 0;
         if (arr.length === 0) return false;
         if (tagOpSelect.value === "AND") {
-          return Array.from(selectedTags).every((t: any) =>
-            arr.includes(t as any),
-          );
+          return Array.from(selectedTags).every((t: any) => arr.includes(t as any));
         }
-        return Array.from(selectedTags).some((t: any) =>
-          arr.includes(t as any),
-        );
+        return Array.from(selectedTags).some((t: any) => arr.includes(t as any));
       }
     });
   }
@@ -288,42 +230,29 @@ function filterAnnotations() {
       if (tagOpSelect.value === "NOT") {
         if ((selectedTags as any).has("__NO_TAG__")) {
           matchTag = arr.length > 0;
-          const otherTags = Array.from(selectedTags).filter(
-            (t: any) => t !== "__NO_TAG__",
-          );
-          if (otherTags.some((t: any) => arr.includes(t as any)))
-            matchTag = false;
+          const otherTags = Array.from(selectedTags).filter((t: any) => t !== "__NO_TAG__");
+          if (otherTags.some((t: any) => arr.includes(t as any))) matchTag = false;
         } else {
           matchTag = arr.every((t) => (selectedTags as any).has(t) === false);
         }
       } else {
         if ((selectedTags as any).has("__NO_TAG__")) {
           matchTag = arr.length === 0;
-          const otherTags = Array.from(selectedTags).filter(
-            (t: any) => t !== "__NO_TAG__",
-          );
-          if (otherTags.some((t: any) => arr.includes(t as any)))
-            matchTag = true;
+          const otherTags = Array.from(selectedTags).filter((t: any) => t !== "__NO_TAG__");
+          if (otherTags.some((t: any) => arr.includes(t as any))) matchTag = true;
         } else if (arr.length === 0) {
           matchTag = false;
         } else if (tagOpSelect.value === "AND") {
-          matchTag = Array.from(selectedTags).every((t: any) =>
-            arr.includes(t as any),
-          );
+          matchTag = Array.from(selectedTags).every((t: any) => arr.includes(t as any));
         } else {
-          matchTag = Array.from(selectedTags).some((t: any) =>
-            arr.includes(t as any),
-          );
+          matchTag = Array.from(selectedTags).some((t: any) => arr.includes(t as any));
         }
       }
     }
     let matchColor = true;
     if (hasColorFilters) {
-      if (colorOpSelect.value === "NOT")
-        matchColor = !(selectedColors as any).has(a.color);
-      else if (colorOpSelect.value === "AND")
-        matchColor =
-          selectedColors.size === 1 && (selectedColors as any).has(a.color);
+      if (colorOpSelect.value === "NOT") matchColor = !(selectedColors as any).has(a.color);
+      else if (colorOpSelect.value === "AND") matchColor = selectedColors.size === 1 && (selectedColors as any).has(a.color);
       else matchColor = (selectedColors as any).has(a.color);
     }
     return matchTag && matchColor;
@@ -340,7 +269,7 @@ function filterAnnotations() {
         return matchesCollection(a);
       });
     } else {
-      combinedResults = annotations.filter((a) => matchesCollection(a));
+      combinedResults = annotations.filter(a => matchesCollection(a));
     }
   } else if (textActive && !bottomActive) {
     combinedResults = textResults.slice();
@@ -350,26 +279,16 @@ function filterAnnotations() {
     combinedResults = textResults.filter((a) => bottomResults.includes(a));
   }
 
-  if (
-    combinedResults.length === 0 &&
-    (selectedTags.size > 0 || selectedColors.size > 0)
-  ) {
+  if (combinedResults.length === 0 && (selectedTags.size > 0 || selectedColors.size > 0)) {
     let allTags = new Set();
     let allColors = new Set();
-    annotations.forEach((a) => {
+    annotations.forEach(a => {
       asTagArray(a.tags).forEach((t: any) => (allTags as any).add(t));
       if (a.color) (allColors as any).add(a.color);
     });
-    let tagGone = Array.from(selectedTags).every(
-      (t: any) => !(allTags as any).has(t) && t !== "__NO_TAG__",
-    );
-    let colorGone = Array.from(selectedColors).every(
-      (c: any) => !(allColors as any).has(c),
-    );
-    if (
-      (selectedTags.size > 0 && tagGone) ||
-      (selectedColors.size > 0 && colorGone)
-    ) {
+    let tagGone = Array.from(selectedTags).every((t: any) => !(allTags as any).has(t) && t !== "__NO_TAG__");
+    let colorGone = Array.from(selectedColors).every((c: any) => !(allColors as any).has(c));
+    if ((selectedTags.size > 0 && tagGone) || (selectedColors.size > 0 && colorGone)) {
       selectedTags.clear();
       selectedColors.clear();
       textInput.value = "";
@@ -394,7 +313,7 @@ function renderAnnotations() {
   annotationContainer.style.gridTemplateColumns = `repeat(${perRow}, 1fr)`;
   // 标记当前每行列数，供样式控制悬停信息开关
   try {
-    (annotationContainer as any).classList.remove("per-1", "per-2", "per-3");
+    (annotationContainer as any).classList.remove('per-1','per-2','per-3');
     (annotationContainer as any).classList.add(`per-${perRow}`);
   } catch {}
   const perPage = parseInt(itemsPerPageSelect.value, 10) || 50;
@@ -412,8 +331,7 @@ function renderAnnotations() {
     const wrapper = document.createElement("div");
     wrapper.className = "annotation-item";
     if (selectedAnnotationIds.has(a.itemID)) {
-      (wrapper as any).style.boxShadow =
-        "0 0 0 3px var(--secondary-color), 0 4px 12px rgba(0,0,0,0.12)";
+      (wrapper as any).style.boxShadow = "0 0 0 3px var(--secondary-color), 0 4px 12px rgba(0,0,0,0.12)";
       (wrapper as any).style.transform = "scale(1.01)";
       (wrapper as any).style.zIndex = 2;
       (wrapper as any).style.background = "#f0f7ff";
@@ -435,19 +353,16 @@ function renderAnnotations() {
     const colorIndicator = document.createElement("div");
     colorIndicator.className = "annotation-color";
     (colorIndicator as any).style.backgroundColor = a.color || "#ccc";
-    (colorIndicator as any).style.outline = selectedAnnotationIds.has(a.itemID)
-      ? "3px solid var(--secondary-color)"
-      : "none";
+    (colorIndicator as any).style.outline = selectedAnnotationIds.has(a.itemID) ? "3px solid var(--secondary-color)" : "none";
     (colorIndicator as any).style.outlineOffset = "2px";
     (colorIndicator as any).style.cursor = "pointer";
     colorIndicator.addEventListener("click", (e) => {
       e.stopPropagation();
-      if (selectedAnnotationIds.has(a.itemID))
-        selectedAnnotationIds.delete(a.itemID);
+      if (selectedAnnotationIds.has(a.itemID)) selectedAnnotationIds.delete(a.itemID);
       else selectedAnnotationIds.add(a.itemID);
       renderAnnotations();
     });
-    colorIndicator.addEventListener("contextmenu", (e: any) => {
+    colorIndicator.addEventListener("contextmenu", (e:any) => {
       e.preventDefault();
       e.stopPropagation();
       openColorMenuForAnnotation(header, a.itemID);
@@ -460,9 +375,8 @@ function renderAnnotations() {
     (textDiv as any).innerHTML = sanitizeHtml(a.text || "");
     highlightInElement(textDiv, textQueryRaw);
     // 原文采用 quote 风格：按颜色加左侧竖线
-    (textDiv as any).style.borderLeft =
-      `3px solid ${a.color || "var(--accent-color)"}`;
-    (textDiv as any).style.paddingLeft = "8px";
+    (textDiv as any).style.borderLeft = `3px solid ${a.color || "var(--accent-color)"}`;
+    (textDiv as any).style.paddingLeft = '8px';
     wrapper.appendChild(textDiv);
 
     if (a.comment) {
@@ -471,7 +385,7 @@ function renderAnnotations() {
       (commentDiv as any).innerHTML = sanitizeHtml(a.comment);
       highlightInElement(commentDiv, commentQueryRaw);
       // 评论仅浅底色，不使用左侧竖线
-      (commentDiv as any).style.borderLeft = "0";
+      (commentDiv as any).style.borderLeft = '0';
       wrapper.appendChild(commentDiv);
     }
 
@@ -489,12 +403,8 @@ function renderAnnotations() {
         (delBtn as any).style.cursor = "pointer";
         (delBtn as any).style.marginLeft = "4px";
         (delBtn as any).style.display = "none";
-        tagElement.addEventListener("mouseenter", () => {
-          (delBtn as any).style.display = "inline";
-        });
-        tagElement.addEventListener("mouseleave", () => {
-          (delBtn as any).style.display = "none";
-        });
+        tagElement.addEventListener("mouseenter", () => { (delBtn as any).style.display = "inline"; });
+        tagElement.addEventListener("mouseleave", () => { (delBtn as any).style.display = "none"; });
         delBtn.addEventListener("click", (e) => {
           e.stopPropagation();
           removeTagFromAnnotation(a.itemID, tag, wrapper);
@@ -520,7 +430,7 @@ function renderAnnotations() {
       if (a.dateAdded) {
         const date = new Date(a.dateAdded);
         const formatted = date.toLocaleString();
-        infoText += a.sourceTitle ? ` | ${formatted}` : formatted;
+        infoText += (a.sourceTitle ? ` | ${formatted}` : formatted);
       }
       (infoDiv as any).textContent = infoText;
       wrapper.appendChild(infoDiv);
@@ -529,16 +439,8 @@ function renderAnnotations() {
     if (idx === 0) {
       const selectAllBtn = document.createElement("button");
       selectAllBtn.className = "select-all-btn";
-      const allSelected = pageResults.every((item: any) =>
-        selectedAnnotationIds.has(item.itemID),
-      );
-      (selectAllBtn as any).textContent = allSelected
-        ? LOCALE === "zh-CN"
-          ? "全不选"
-          : "Deselect All"
-        : LOCALE === "zh-CN"
-          ? "全选"
-          : "Select All";
+      const allSelected = pageResults.every((item: any) => selectedAnnotationIds.has(item.itemID));
+      (selectAllBtn as any).textContent = allSelected ? (LOCALE === 'zh-CN' ? '全不选' : 'Deselect All') : (LOCALE === 'zh-CN' ? '全选' : 'Select All');
       (selectAllBtn as any).style.position = "absolute";
       (selectAllBtn as any).style.right = "16px";
       (selectAllBtn as any).style.bottom = "12px";
@@ -558,41 +460,20 @@ function renderAnnotations() {
         (selectAllBtn as any).style.display = "none";
       });
       selectAllBtn.addEventListener("click", () => {
-        const allSelectedNow = pageResults.every((item: any) =>
-          selectedAnnotationIds.has(item.itemID),
-        );
-        if (allSelectedNow)
-          pageResults.forEach((item: any) =>
-            selectedAnnotationIds.delete(item.itemID),
-          );
-        else
-          pageResults.forEach((item: any) =>
-            selectedAnnotationIds.add(item.itemID),
-          );
+        const allSelectedNow = pageResults.every((item: any) => selectedAnnotationIds.has(item.itemID));
+        if (allSelectedNow) pageResults.forEach((item: any) => selectedAnnotationIds.delete(item.itemID));
+        else pageResults.forEach((item: any) => selectedAnnotationIds.add(item.itemID));
         renderAnnotations();
       });
       wrapper.addEventListener("mousemove", (e) => {
         const rect = (wrapper as any).getBoundingClientRect();
         const x = (e as any).clientX - rect.left;
         const y = (e as any).clientY - rect.top;
-        const btnRect = {
-          left: (wrapper as any).offsetWidth - 120,
-          top: (wrapper as any).offsetHeight - 40,
-          right: (wrapper as any).offsetWidth,
-          bottom: (wrapper as any).offsetHeight,
-        };
-        if (
-          x >= btnRect.left &&
-          x <= btnRect.right &&
-          y >= btnRect.top &&
-          y <= btnRect.bottom
-        )
-          (selectAllBtn as any).style.display = "block";
+        const btnRect = { left: (wrapper as any).offsetWidth - 120, top: (wrapper as any).offsetHeight - 40, right: (wrapper as any).offsetWidth, bottom: (wrapper as any).offsetHeight };
+        if (x >= btnRect.left && x <= btnRect.right && y >= btnRect.top && y <= btnRect.bottom) (selectAllBtn as any).style.display = "block";
         else (selectAllBtn as any).style.display = "none";
       });
-      wrapper.addEventListener("mouseleave", () => {
-        (selectAllBtn as any).style.display = "none";
-      });
+      wrapper.addEventListener("mouseleave", () => { (selectAllBtn as any).style.display = "none"; });
       wrapper.appendChild(selectAllBtn);
     }
 
@@ -600,22 +481,12 @@ function renderAnnotations() {
   });
 
   const count = combinedResults.length;
-  if (LOCALE === "zh-CN")
-    displayCountDiv.textContent = getString("displayCountZH").replace(
-      "{count}",
-      count,
-    );
-  else
-    displayCountDiv.textContent = getString("displayCountEN").replace(
-      "{count}",
-      count,
-    );
+  if (LOCALE === "zh-CN") displayCountDiv.textContent = getString("displayCountZH").replace("{count}", count);
+  else displayCountDiv.textContent = getString("displayCountEN").replace("{count}", count);
   prevPageButton.disabled = currentPage <= 1;
   nextPageButton.disabled = currentPage >= totalPages;
   const infoTemplate = getString("pageInfo");
-  pageInfoSpan.textContent = infoTemplate
-    .replace("{current}", currentPage)
-    .replace("{total}", totalPages);
+  pageInfoSpan.textContent = infoTemplate.replace("{current}", currentPage).replace("{total}", totalPages);
 }
 
 function renderBottomOptions() {
@@ -628,144 +499,121 @@ function renderBottomOptions() {
     const arr = asTagArray(a.tags);
     if (tagOpSelect.value === "NOT") {
       if ((selectedTags as any).has("__NO_TAG__")) return arr.length > 0;
-      return arr.every((t) => !(selectedTags as any).has(t));
+      return arr.every((t)=>!(selectedTags as any).has(t));
     }
-    if (tagOpSelect.value === "AND")
-      return Array.from(selectedTags).every((t: any) => arr.includes(t as any));
-    if ((selectedTags as any).has("__NO_TAG__")) return arr.length === 0;
-    return Array.from(selectedTags).some((t: any) => arr.includes(t as any));
+    if (tagOpSelect.value === "AND") return Array.from(selectedTags).every((t:any)=>arr.includes(t as any));
+    if ((selectedTags as any).has("__NO_TAG__")) return arr.length===0;
+    return Array.from(selectedTags).some((t:any)=>arr.includes(t as any));
   });
   const tagsBase = textResults.filter((a) => {
     if (!hasColorFilters) return true;
-    if (colorOpSelect.value === "NOT")
-      return !(selectedColors as any).has(a.color);
-    if (colorOpSelect.value === "AND")
-      return selectedColors.size === 1 && (selectedColors as any).has(a.color);
+    if (colorOpSelect.value === "NOT") return !(selectedColors as any).has(a.color);
+    if (colorOpSelect.value === "AND") return selectedColors.size === 1 && (selectedColors as any).has(a.color);
     return (selectedColors as any).has(a.color);
   });
-  const colorSource =
-    colorOpSelect.value === "OR" ? colorsBase : combinedResults;
-  const tagSource = tagOpSelect.value === "OR" ? tagsBase : combinedResults;
-  const colorsSet = new Set(
-    colorSource.map((a: any) => a.color).filter(Boolean),
-  );
-  const tagsSet = new Set<string>();
-  tagSource.forEach((a: any) => {
-    asTagArray(a.tags).forEach((t: string) => tagsSet.add(t));
-  });
+  const colorSource = colorOpSelect.value === "OR" ? colorsBase : combinedResults;
+  const tagSource   = tagOpSelect.value   === "OR" ? tagsBase   : combinedResults;
+  const colorsSet = new Set(colorSource.map((a:any)=>a.color).filter(Boolean));
+  const tagsSet   = new Set<string>();
+  tagSource.forEach((a:any)=>{ asTagArray(a.tags).forEach((t:string)=>tagsSet.add(t)); });
   const noTagValue = "__NO_TAG__";
   if (!(tagOpSelect.value === "NOT" && (selectedTags as any).has(noTagValue))) {
     const noTagEl = document.createElement("span");
     noTagEl.className = "tag-item";
     (noTagEl as any).textContent = getString("noTag");
-    if (tagOpSelect.value !== "NOT" && (selectedTags as any).has(noTagValue))
-      noTagEl.classList.add("selected");
+    if (tagOpSelect.value !== "NOT" && (selectedTags as any).has(noTagValue)) noTagEl.classList.add("selected");
     noTagEl.addEventListener("click", () => {
-      if ((selectedTags as any).has(noTagValue))
-        (selectedTags as any).delete(noTagValue);
+      if ((selectedTags as any).has(noTagValue)) (selectedTags as any).delete(noTagValue);
       else (selectedTags as any).add(noTagValue);
       filterAnnotations();
     });
     tagsListContainer.appendChild(noTagEl);
   }
-  Array.from(tagsSet)
-    .sort((a: any, b: any) => String(a).localeCompare(String(b), "zh-CN"))
-    .forEach((tag: any) => {
-      if (tagOpSelect.value === "NOT" && (selectedTags as any).has(tag)) return;
-      const tagEl = document.createElement("span");
-      tagEl.className = "tag-item";
-      (tagEl as any).textContent = tag;
-      if ((selectedTags as any).has(tag)) tagEl.classList.add("selected");
-      tagEl.addEventListener("click", () => {
-        if ((selectedTags as any).has(tag)) (selectedTags as any).delete(tag);
-        else (selectedTags as any).add(tag);
-        filterAnnotations();
-      });
-      tagsListContainer.appendChild(tagEl);
+  Array.from(tagsSet).sort((a:any,b:any)=>String(a).localeCompare(String(b),"zh-CN")).forEach((tag:any) => {
+    if (tagOpSelect.value === "NOT" && (selectedTags as any).has(tag)) return;
+    const tagEl = document.createElement("span");
+    tagEl.className = "tag-item";
+    (tagEl as any).textContent = tag;
+    if ((selectedTags as any).has(tag)) tagEl.classList.add("selected");
+    tagEl.addEventListener("click", () => {
+      if ((selectedTags as any).has(tag)) (selectedTags as any).delete(tag);
+      else (selectedTags as any).add(tag);
+      filterAnnotations();
     });
-  Array.from(colorsSet)
-    .sort()
-    .forEach((col: any) => {
-      if (colorOpSelect.value === "NOT" && (selectedColors as any).has(col))
-        return;
-      const colEl = document.createElement("div");
-      colEl.className = "color-item";
-      (colEl as any).style.backgroundColor = col;
-      if ((selectedColors as any).has(col)) colEl.classList.add("selected");
-      colEl.addEventListener("click", () => {
-        if ((selectedColors as any).has(col))
-          (selectedColors as any).delete(col);
-        else (selectedColors as any).add(col);
-        filterAnnotations();
-      });
-      colorsListContainer.appendChild(colEl);
+    tagsListContainer.appendChild(tagEl);
+  });
+  Array.from(colorsSet).sort().forEach((col:any) => {
+    if (colorOpSelect.value === "NOT" && (selectedColors as any).has(col)) return;
+    const colEl = document.createElement("div");
+    colEl.className = "color-item";
+    (colEl as any).style.backgroundColor = col;
+    if ((selectedColors as any).has(col)) colEl.classList.add("selected");
+    colEl.addEventListener("click", () => {
+      if ((selectedColors as any).has(col)) (selectedColors as any).delete(col);
+      else (selectedColors as any).add(col);
+      filterAnnotations();
     });
+    colorsListContainer.appendChild(colEl);
+  });
 }
 
 function renderCollectionsTree() {
   if (!collectionsTreeEl) return;
   const paths = new Set<string>();
-  (annotations || []).forEach((a: any) => {
-    (Array.isArray(a.collectionPaths) ? a.collectionPaths : []).forEach(
-      (p: any) => {
-        if (p) paths.add(p);
-      },
-    );
+  (annotations || []).forEach((a:any) => {
+    (Array.isArray(a.collectionPaths) ? a.collectionPaths : []).forEach((p:any) => { if (p) paths.add(p); });
   });
-  const root: any = { name: "", path: "", children: new Map() };
-  Array.from(paths).forEach((p: any) => {
-    const segs = String(p).split(" / ").filter(Boolean);
+  const root:any = { name: '', path: '', children: new Map() };
+  Array.from(paths).forEach((p:any) => {
+    const segs = String(p).split(' / ').filter(Boolean);
     let cursor = root;
-    let acc = "";
+    let acc = '';
     segs.forEach((seg, idx) => {
-      acc = idx === 0 ? seg : acc + " / " + seg;
-      if (!cursor.children.has(seg))
-        cursor.children.set(seg, { name: seg, path: acc, children: new Map() });
+      acc = idx === 0 ? seg : acc + ' / ' + seg;
+      if (!cursor.children.has(seg)) cursor.children.set(seg, { name: seg, path: acc, children: new Map() });
       cursor = cursor.children.get(seg);
     });
   });
-  collectionsTreeEl.innerHTML = "";
-  const ul = document.createElement("ul");
+  collectionsTreeEl.innerHTML = '';
+  const ul = document.createElement('ul');
   collectionsTreeEl.appendChild(ul);
-  function renderNodeMap(map: any, parentUL: any) {
-    Array.from(map.keys())
-      .sort((a: any, b: any) => String(a).localeCompare(String(b), "zh-CN"))
-      .forEach((key: any) => {
-        const node = map.get(key);
-        const li = document.createElement("li");
-        const cb = document.createElement("input");
-        cb.type = "checkbox";
-        (cb as any).dataset.path = node.path;
-        (cb as any).checked = selectedCollectionPaths.has(node.path);
-        cb.addEventListener("change", () => {
-          const checked = (cb as any).checked;
-          toggleDescendants(li, checked);
-          updateAncestors(li);
-          updateCollectionsTriggerLabel();
-          filterAnnotations();
-        });
-        const label = document.createElement("span");
-        label.className = "node-label";
-        (label as any).textContent = node.name;
-        (label as any).title = node.path || node.name || "";
-        li.appendChild(cb);
-        li.appendChild(label);
-        if (node.children.size > 0) {
-          li.classList.add("has-children");
-          const childUL = document.createElement("ul");
-          renderNodeMap(node.children, childUL);
-          li.appendChild(childUL);
-          label.addEventListener("click", (e: any) => {
-            e.stopPropagation();
-            li.classList.toggle("collapsed");
-          });
-        }
-        parentUL.appendChild(li);
+  function renderNodeMap(map:any, parentUL: any) {
+    Array.from(map.keys()).sort((a:any,b:any)=>String(a).localeCompare(String(b),'zh-CN')).forEach((key:any) => {
+      const node = map.get(key);
+      const li = document.createElement('li');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      (cb as any).dataset.path = node.path;
+      (cb as any).checked = selectedCollectionPaths.has(node.path);
+      cb.addEventListener('change', () => {
+        const checked = (cb as any).checked;
+        toggleDescendants(li, checked);
+        updateAncestors(li);
+        updateCollectionsTriggerLabel();
+        filterAnnotations();
       });
+      const label = document.createElement('span');
+      label.className = 'node-label';
+      (label as any).textContent = node.name;
+      (label as any).title = node.path || node.name || '';
+      li.appendChild(cb);
+      li.appendChild(label);
+      if (node.children.size > 0) {
+        li.classList.add('has-children');
+        const childUL = document.createElement('ul');
+        renderNodeMap(node.children, childUL);
+        li.appendChild(childUL);
+        label.addEventListener('click', (e:any) => {
+          e.stopPropagation();
+          li.classList.toggle('collapsed');
+        });
+      }
+      parentUL.appendChild(li);
+    });
   }
   renderNodeMap(root.children, ul);
 
-  function toggleDescendants(li: any, checked: boolean) {
+  function toggleDescendants(li:any, checked:boolean) {
     const cb = li.querySelector('input[type="checkbox"]') as any;
     if (cb && cb.dataset.path) {
       if (checked) selectedCollectionPaths.add(cb.dataset.path);
@@ -774,7 +622,7 @@ function renderCollectionsTree() {
       cb.indeterminate = false;
     }
     const childCBs = li.querySelectorAll('ul input[type="checkbox"]') as any;
-    childCBs.forEach((c: any) => {
+    childCBs.forEach((c:any) => {
       const path = c.dataset.path;
       c.checked = checked;
       c.indeterminate = false;
@@ -785,39 +633,23 @@ function renderCollectionsTree() {
     });
   }
 
-  function updateAncestors(li: any) {
+  function updateAncestors(li:any) {
     let parent = li.parentElement;
     while (parent && parent !== collectionsTreeEl) {
-      if (parent.tagName.toLowerCase() === "ul") {
+      if (parent.tagName.toLowerCase() === 'ul') {
         const pli = parent.parentElement as any;
-        if (pli && pli.tagName.toLowerCase() === "li") {
-          const checks = parent.querySelectorAll(
-            ':scope > li > input[type="checkbox"]',
-          ) as any;
-          let allChecked = true,
-            anyChecked = false;
-          checks.forEach((c: any) => {
-            if (c.checked) anyChecked = true;
-            else allChecked = false;
-            if (c.indeterminate) {
-              anyChecked = true;
-              allChecked = false;
-            }
+        if (pli && pli.tagName.toLowerCase() === 'li') {
+          const checks = parent.querySelectorAll(':scope > li > input[type="checkbox"]') as any;
+          let allChecked = true, anyChecked = false;
+          checks.forEach((c:any) => {
+            if (c.checked) anyChecked = true; else allChecked = false;
+            if (c.indeterminate) { anyChecked = true; allChecked = false; }
           });
-          const pcb = pli.querySelector(
-            ':scope > input[type="checkbox"]',
-          ) as any;
+          const pcb = pli.querySelector(':scope > input[type="checkbox"]') as any;
           if (pcb) {
-            if (allChecked) {
-              pcb.checked = true;
-              pcb.indeterminate = false;
-            } else if (anyChecked) {
-              pcb.checked = false;
-              pcb.indeterminate = true;
-            } else {
-              pcb.checked = false;
-              pcb.indeterminate = false;
-            }
+            if (allChecked) { pcb.checked = true; pcb.indeterminate = false; }
+            else if (anyChecked) { pcb.checked = false; pcb.indeterminate = true; }
+            else { pcb.checked = false; pcb.indeterminate = false; }
             const path = pcb.dataset.path;
             if (path) {
               if (pcb.checked) selectedCollectionPaths.add(path);
@@ -835,80 +667,66 @@ function renderCollectionsTree() {
 
 function toggleCollectionsPanel(show?: boolean) {
   if (!collectionsPanel) return;
-  const target =
-    typeof show === "boolean"
-      ? show
-      : collectionsPanel.style.display !== "block";
-  collectionsPanel.style.display = target ? "block" : "none";
+  const target = (typeof show === 'boolean') ? show : (collectionsPanel.style.display !== 'block');
+  collectionsPanel.style.display = target ? 'block' : 'none';
 }
 function updateCollectionsTriggerLabel() {
   if (!collectionsTrigger) return;
   if (selectedCollectionPaths.size === 0) {
-    (collectionsTrigger as any).textContent = getString("collectionAll");
+    (collectionsTrigger as any).textContent = getString('collectionAll');
     return;
   }
-  const arr = Array.from(selectedCollectionPaths).sort((a: any, b: any) =>
-    String(a).localeCompare(String(b), "zh-CN"),
-  );
-  if (arr.length <= 2)
-    (collectionsTrigger as any).textContent = (arr as any).join(", ");
-  else
-    (collectionsTrigger as any).textContent =
-      (arr as any)[0] + ` +${(arr as any).length - 1}`;
+  const arr = Array.from(selectedCollectionPaths).sort((a:any,b:any)=>String(a).localeCompare(String(b),'zh-CN'));
+  if (arr.length <= 2) (collectionsTrigger as any).textContent = (arr as any).join(', ');
+  else (collectionsTrigger as any).textContent = (arr as any)[0] + ` +${(arr as any).length - 1}`;
 }
-collectionsTrigger &&
-  collectionsTrigger.addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleCollectionsPanel();
-  });
-document.addEventListener("click", (e) => {
+collectionsTrigger && collectionsTrigger.addEventListener('click', (e) => {
+  e.stopPropagation();
+  toggleCollectionsPanel();
+});
+document.addEventListener('click', (e) => {
   if (!collectionsPanel) return;
-  if (collectionsPanel.style.display !== "block") return;
-  const within =
-    collectionsPanel.contains(e.target as any) ||
-    collectionsTrigger.contains(e.target as any);
+  if (collectionsPanel.style.display !== 'block') return;
+  const within = collectionsPanel.contains(e.target as any) || collectionsTrigger.contains(e.target as any);
   if (!within) toggleCollectionsPanel(false);
 });
 
-function renderHistogram(container: any, data: any, isColor = false) {
+function renderHistogram(container:any, data:any, isColor = false) {
   container.innerHTML = "";
   if (Object.keys(data).length === 0) {
-    container.innerHTML =
-      '<div class="no-data">' + getString("noData") + "</div>";
+    container.innerHTML = '<div class="no-data">' + getString('noData') + '</div>';
     return;
   }
   const keys = Object.keys(data);
-  const maxVal = Math.max(...(Object.values(data) as any));
-  keys.sort(
-    (a: any, b: any) => data[b] - data[a] || a.localeCompare(b, "zh-CN"),
-  );
-  keys.forEach((key: any) => {
+  const maxVal = Math.max(...Object.values(data) as any);
+  keys.sort((a:any, b:any) => (data[b] - data[a]) || a.localeCompare(b, 'zh-CN'));
+  keys.forEach((key:any) => {
     const val = (data as any)[key];
-    const row = document.createElement("div");
-    row.className = "histogram-row";
-    const labelSection = document.createElement("div");
-    labelSection.className = "label-section";
+    const row = document.createElement('div');
+    row.className = 'histogram-row';
+    const labelSection = document.createElement('div');
+    labelSection.className = 'label-section';
     if (isColor) {
-      const swatch = document.createElement("div");
-      swatch.className = "color-swatch";
+      const swatch = document.createElement('div');
+      swatch.className = 'color-swatch';
       (swatch as any).style.backgroundColor = key;
       labelSection.appendChild(swatch);
     }
-    const labelText = document.createElement("span");
-    labelText.className = "label-text";
+    const labelText = document.createElement('span');
+    labelText.className = 'label-text';
     (labelText as any).textContent = key;
     labelSection.appendChild(labelText);
     row.appendChild(labelSection);
-    const barContainer = document.createElement("div");
-    barContainer.className = "bar-container";
-    const bar = document.createElement("div");
-    bar.className = "bar";
-    (bar as any).style.backgroundColor = isColor ? key : "#5c6bc0";
+    const barContainer = document.createElement('div');
+    barContainer.className = 'bar-container';
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    (bar as any).style.backgroundColor = isColor ? key : '#5c6bc0';
     (bar as any).style.width = `${(val / maxVal) * 100}%`;
     barContainer.appendChild(bar);
     row.appendChild(barContainer);
-    const count = document.createElement("div");
-    count.className = "count";
+    const count = document.createElement('div');
+    count.className = 'count';
     (count as any).textContent = val;
     row.appendChild(count);
     container.appendChild(row);
@@ -916,46 +734,38 @@ function renderHistogram(container: any, data: any, isColor = false) {
 }
 
 function renderStats() {
-  const colorCounts: any = {};
-  const tagCounts: any = {};
-  combinedResults.forEach((a: any) => {
+  const colorCounts:any = {};
+  const tagCounts:any = {};
+  combinedResults.forEach((a:any) => {
     if (a.color) colorCounts[a.color] = (colorCounts[a.color] || 0) + 1;
-    asTagArray(a.tags).forEach((t: string) => {
+    asTagArray(a.tags).forEach((t:string) => {
       tagCounts[t] = (tagCounts[t] || 0) + 1;
     });
   });
-  const colorHist = document.getElementById("color-histogram") as any;
+  const colorHist = document.getElementById('color-histogram') as any;
   renderHistogram(colorHist, colorCounts, true);
-  const tagHist = document.getElementById("tag-histogram") as any;
+  const tagHist = document.getElementById('tag-histogram') as any;
   renderHistogram(tagHist, tagCounts, false);
 }
 
-async function removeTagFromAnnotation(
-  itemID: number,
-  tagToRemove: string,
-  wrapper: any,
-) {
+async function removeTagFromAnnotation(itemID:number, tagToRemove:string, wrapper:any) {
   try {
     const item = await (window as any).parent.Zotero.Items.get(itemID);
     if (!item) throw new Error("未找到 itemID=" + itemID);
     const existingTagObjs = item.getTags();
-    const existingTags = existingTagObjs.map((tObj: any) => tObj.tag);
-    const newTagNames = existingTags.filter((t: any) => t !== tagToRemove);
-    item.setTags(newTagNames.map((t: any) => ({ tag: t })));
+    const existingTags = existingTagObjs.map((tObj:any) => tObj.tag);
+    const newTagNames = existingTags.filter((t:any) => t !== tagToRemove);
+    item.setTags(newTagNames.map((t:any) => ({ tag: t })));
     await item.saveTx();
     (window as any).parent.Zotero.Notifier.trigger("item", "modify", itemID);
-    const idx = annotations.findIndex((a: any) => a.itemID === itemID);
+    const idx = annotations.findIndex((a:any) => a.itemID === itemID);
     if (idx >= 0) {
       (annotations as any)[idx].tags = newTagNames;
     }
     const tagsContainer = wrapper.querySelector(".annotation-tags") as any;
-    tagsContainer
-      .querySelectorAll(".annotation-tag")
-      .forEach((el: any) => el.remove());
-    tagsContainer
-      .querySelectorAll(".add-tag-wrapper")
-      .forEach((el: any) => el.remove());
-    newTagNames.forEach((t: any) => {
+    tagsContainer.querySelectorAll(".annotation-tag").forEach((el:any) => el.remove());
+    tagsContainer.querySelectorAll(".add-tag-wrapper").forEach((el:any) => el.remove());
+    newTagNames.forEach((t:any) => {
       const tagEl = document.createElement("span");
       tagEl.className = "annotation-tag";
       (tagEl as any).textContent = t;
@@ -965,16 +775,9 @@ async function removeTagFromAnnotation(
       (delBtn as any).style.color = "#c0392b";
       (delBtn as any).style.marginLeft = "4px";
       (delBtn as any).style.display = "none";
-      tagEl.addEventListener("mouseenter", () => {
-        (delBtn as any).style.display = "inline";
-      });
-      tagEl.addEventListener("mouseleave", () => {
-        (delBtn as any).style.display = "none";
-      });
-      delBtn.addEventListener("click", (e: any) => {
-        e.stopPropagation();
-        removeTagFromAnnotation(itemID, t, wrapper);
-      });
+      tagEl.addEventListener("mouseenter", () => { (delBtn as any).style.display = "inline"; });
+      tagEl.addEventListener("mouseleave", () => { (delBtn as any).style.display = "none"; });
+      delBtn.addEventListener("click", (e:any) => { e.stopPropagation(); removeTagFromAnnotation(itemID, t, wrapper); });
       tagEl.appendChild(delBtn);
       tagsContainer.appendChild(tagEl);
     });
@@ -988,55 +791,29 @@ async function removeTagFromAnnotation(
 textInput.addEventListener("input", filterAnnotations);
 commentInput.addEventListener("input", filterAnnotations);
 itemsPerRowInput.addEventListener("change", renderAnnotations);
-itemsPerPageSelect.addEventListener("change", () => {
-  currentPage = 1;
-  renderAnnotations();
-});
+itemsPerPageSelect.addEventListener("change", () => { currentPage = 1; renderAnnotations(); });
 datePresetSelect.addEventListener("change", filterAnnotations);
-tagOpSelect.addEventListener("change", () => {
-  selectedTags.clear();
-  filterAnnotations();
-});
-colorOpSelect.addEventListener("change", () => {
-  selectedColors.clear();
-  filterAnnotations();
-});
-prevPageButton.addEventListener("click", () => {
-  if (currentPage > 1) {
-    currentPage--;
-    renderAnnotations();
-  }
-});
-nextPageButton.addEventListener("click", () => {
-  if (currentPage < totalPages) {
-    currentPage++;
-    renderAnnotations();
-  }
-});
+tagOpSelect.addEventListener("change", () => { selectedTags.clear(); filterAnnotations(); });
+colorOpSelect.addEventListener("change", () => { selectedColors.clear(); filterAnnotations(); });
+prevPageButton.addEventListener("click", () => { if (currentPage > 1) { currentPage--; renderAnnotations(); } });
+nextPageButton.addEventListener("click", () => { if (currentPage < totalPages) { currentPage++; renderAnnotations(); } });
 
 const batchTagInput = document.getElementById("batch-tag-input") as any;
-const batchTagSuggestions = document.getElementById(
-  "batch-tag-suggestions",
-) as any;
+const batchTagSuggestions = document.getElementById("batch-tag-suggestions") as any;
 const batchAddTagBtn = document.getElementById("batch-add-tag-btn") as any;
 
 function getCurrentTagSuggestions() {
   const tagsSet = new Set<string>();
-  combinedResults.forEach((a: any) => {
-    asTagArray(a.tags).forEach((t: string) => tagsSet.add(t));
+  combinedResults.forEach((a:any) => {
+    asTagArray(a.tags).forEach((t:string) => tagsSet.add(t));
   });
   return Array.from(tagsSet).sort((a, b) => a.localeCompare(b, "zh-CN"));
 }
 function renderBatchTagSuggestions(filter = "") {
-  const suggestions = getCurrentTagSuggestions().filter((t: any) =>
-    t.includes(filter),
-  );
-  if (suggestions.length === 0) {
-    (batchTagSuggestions as any).style.display = "none";
-    return;
-  }
+  const suggestions = getCurrentTagSuggestions().filter((t:any) => t.includes(filter));
+  if (suggestions.length === 0) { (batchTagSuggestions as any).style.display = "none"; return; }
   batchTagSuggestions.innerHTML = "";
-  suggestions.forEach((tag: any) => {
+  suggestions.forEach((tag:any) => {
     const item = document.createElement("div");
     (item as any).textContent = tag;
     (item as any).style.padding = "8px 12px";
@@ -1050,56 +827,34 @@ function renderBatchTagSuggestions(filter = "") {
   });
   (batchTagSuggestions as any).style.display = "block";
 }
-batchTagInput.addEventListener("focus", () => {
-  renderBatchTagSuggestions(batchTagInput.value.trim());
-});
-batchTagInput.addEventListener("input", () => {
-  renderBatchTagSuggestions(batchTagInput.value.trim());
-});
-batchTagInput.addEventListener("blur", () => {
-  setTimeout(() => {
-    (batchTagSuggestions as any).style.display = "none";
-  }, 150);
-});
+batchTagInput.addEventListener("focus", () => { renderBatchTagSuggestions(batchTagInput.value.trim()); });
+batchTagInput.addEventListener("input", () => { renderBatchTagSuggestions(batchTagInput.value.trim()); });
+batchTagInput.addEventListener("blur", () => { setTimeout(() => { (batchTagSuggestions as any).style.display = "none"; }, 150); });
 batchAddTagBtn.addEventListener("click", async () => {
   const tag = batchTagInput.value.trim();
-  if (!tag) {
-    alert("请输入要添加的标签");
-    return;
-  }
-  if (selectedAnnotationIds.size === 0) {
-    alert("请先选中要添加标签的批注");
-    return;
-  }
+  if (!tag) { alert("请输入要添加的标签"); return; }
+  if (selectedAnnotationIds.size === 0) { alert("请先选中要添加标签的批注"); return; }
   (batchAddTagBtn as any).disabled = true;
   for (const itemID of selectedAnnotationIds) {
     try {
       const item = await (window as any).parent.Zotero.Items.get(itemID);
       if (!item) continue;
       const existingTagObjs = item.getTags();
-      const existingTags = existingTagObjs.map((tObj: any) => tObj.tag);
+      const existingTags = existingTagObjs.map((tObj:any) => tObj.tag);
       if (!existingTags.includes(tag)) {
         existingTags.push(tag);
-        item.setTags(existingTags.map((t: any) => ({ tag: t })));
+        item.setTags(existingTags.map((t:any) => ({ tag: t })));
         await item.saveTx();
-        (window as any).parent.Zotero.Notifier.trigger(
-          "item",
-          "modify",
-          itemID,
-        );
-        const idx = annotations.findIndex((a: any) => a.itemID === itemID);
+        (window as any).parent.Zotero.Notifier.trigger("item", "modify", itemID);
+        const idx = annotations.findIndex((a:any) => a.itemID === itemID);
         if (idx >= 0) {
           const current = (annotations as any)[idx].tags;
-          const arr = Array.isArray(current)
-            ? [...current]
-            : asTagArray(current);
+          const arr = Array.isArray(current) ? [...current] : asTagArray(current);
           if (!arr.includes(tag)) arr.push(tag);
           (annotations as any)[idx].tags = arr;
         }
       }
-    } catch (e) {
-      console.error("添加标签失败", itemID, e);
-    }
+    } catch (e) { console.error("添加标签失败", itemID, e); }
   }
   (batchAddTagBtn as any).disabled = false;
   batchTagInput.value = "";
@@ -1109,26 +864,26 @@ batchAddTagBtn.addEventListener("click", async () => {
 
 function getCurrentColorOptions() {
   const counts: Record<string, number> = {};
-  annotations.forEach((a: any) => {
+  (annotations).forEach((a:any) => {
     const c = a.color;
     if (!c) return;
     counts[c] = (counts[c] || 0) + 1;
   });
   const sorted = Object.keys(counts).sort((a, b) => {
     if (counts[b] !== counts[a]) return counts[b] - counts[a];
-    return String(a).localeCompare(String(b), "zh-CN");
+    return String(a).localeCompare(String(b), 'zh-CN');
   });
   return sorted.slice(0, 20);
 }
 
-async function changeAnnotationColor(itemID: number, newColor: string) {
+async function changeAnnotationColor(itemID:number, newColor:string) {
   try {
     const item = await (window as any).parent.Zotero.Items.get(itemID);
     if (!item) throw new Error("未找到 itemID=" + itemID);
     (item as any).annotationColor = newColor;
     await item.saveTx();
     (window as any).parent.Zotero.Notifier.trigger("item", "modify", itemID);
-    const idx = annotations.findIndex((a: any) => a.itemID === itemID);
+    const idx = annotations.findIndex((a:any) => a.itemID === itemID);
     if (idx >= 0) {
       (annotations as any)[idx].color = newColor;
     }
@@ -1141,28 +896,28 @@ async function changeAnnotationColor(itemID: number, newColor: string) {
 
 function openColorMenuForAnnotation(containerEl: HTMLElement, itemID: number) {
   // 关闭已有菜单
-  const existed = containerEl.querySelector(".color-menu") as any;
+  const existed = containerEl.querySelector('.color-menu') as any;
   if (existed && existed.parentNode) existed.parentNode.removeChild(existed);
-  const docMenu = document.querySelector(".color-menu") as any;
+  const docMenu = document.querySelector('.color-menu') as any;
   if (docMenu && docMenu.parentNode) docMenu.parentNode.removeChild(docMenu);
 
-  const menu = document.createElement("div");
-  menu.className = "color-menu";
+  const menu = document.createElement('div');
+  menu.className = 'color-menu';
 
   const colors = getCurrentColorOptions();
   if (colors.length === 0) {
-    const none = document.createElement("div");
-    (none as any).textContent = LOCALE === "zh-CN" ? "无可用颜色" : "No colors";
-    (none as any).style.fontSize = "12px";
-    (none as any).style.color = "#888";
-    (none as any).style.padding = "4px 6px";
+    const none = document.createElement('div');
+    (none as any).textContent = LOCALE === 'zh-CN' ? '无可用颜色' : 'No colors';
+    (none as any).style.fontSize = '12px';
+    (none as any).style.color = '#888';
+    (none as any).style.padding = '4px 6px';
     menu.appendChild(none);
   } else {
-    colors.forEach((col: any) => {
-      const opt = document.createElement("div");
-      opt.className = "color-option";
+    colors.forEach((col:any) => {
+      const opt = document.createElement('div');
+      opt.className = 'color-option';
       (opt as any).style.backgroundColor = col;
-      opt.addEventListener("mousedown", async (e: any) => {
+      opt.addEventListener('mousedown', async (e:any) => {
         e.preventDefault();
         e.stopPropagation();
         await changeAnnotationColor(itemID, col);
@@ -1175,3 +930,5 @@ function openColorMenuForAnnotation(containerEl: HTMLElement, itemID: number) {
   // 挂到 header 上，按 CSS 相对定位
   containerEl.appendChild(menu);
 }
+
+
