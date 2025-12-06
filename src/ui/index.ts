@@ -18,15 +18,15 @@ let totalPages = 1;
 
 const textInput = document.getElementById("text-search") as any;
 const commentInput = document.getElementById("comment-search") as any;
-const itemsPerRowInput = document.getElementById("items-per-row") as any;
+const itemsPerRowContainer = document.getElementById("items-per-row") as any;
 const itemsPerPageSelect = document.getElementById("items-per-page") as any;
 const datePresetSelect = document.getElementById("date-preset") as any;
 const collectionsTreeEl = document.getElementById("collections-tree") as any;
 const collectionsTrigger = document.getElementById("collections-trigger") as any;
 const collectionsPanel = document.getElementById("collections-panel") as any;
 let selectedCollectionPaths = new Set<string>();
-const tagOpSelect = document.getElementById("tag-op") as any;
-const colorOpSelect = document.getElementById("color-op") as any;
+// Remove tag-op and color-op selects
+let currentLayout = 1; // Track current layout
 const prevPageButton = document.getElementById("prev-page") as any;
 const nextPageButton = document.getElementById("next-page") as any;
 const pageInfoSpan = document.getElementById("page-info") as any;
@@ -184,17 +184,10 @@ function filterAnnotations() {
   if (hasTagFilters) {
     colorsSource = textResults.filter((a) => {
       const arr = asTagArray(a.tags);
-      if (tagOpSelect.value === "NOT") {
-        if ((selectedTags as any).has("__NO_TAG__")) return arr.length > 0;
-        return arr.every((t) => (selectedTags as any).has(t) === false);
-      } else {
-        if ((selectedTags as any).has("__NO_TAG__")) return arr.length === 0;
-        if (arr.length === 0) return false;
-        if (tagOpSelect.value === "AND") {
-          return Array.from(selectedTags).every((t: any) => arr.includes(t as any));
-        }
-        return Array.from(selectedTags).some((t: any) => arr.includes(t as any));
-      }
+      if ((selectedTags as any).has("__NO_TAG__")) return arr.length === 0;
+      if (arr.length === 0) return false;
+      // Always use OR logic
+      return Array.from(selectedTags).some((t: any) => arr.includes(t as any));
     });
   }
 
@@ -208,33 +201,21 @@ function filterAnnotations() {
     let matchTag = true;
     if (hasTagFilters) {
       const arr = asTagArray(a.tags);
-      if (tagOpSelect.value === "NOT") {
-        if ((selectedTags as any).has("__NO_TAG__")) {
-          matchTag = arr.length > 0;
-          const otherTags = Array.from(selectedTags).filter((t: any) => t !== "__NO_TAG__");
-          if (otherTags.some((t: any) => arr.includes(t as any))) matchTag = false;
-        } else {
-          matchTag = arr.every((t) => (selectedTags as any).has(t) === false);
-        }
+      if ((selectedTags as any).has("__NO_TAG__")) {
+        matchTag = arr.length === 0;
+        const otherTags = Array.from(selectedTags).filter((t: any) => t !== "__NO_TAG__");
+        if (otherTags.some((t: any) => arr.includes(t as any))) matchTag = true;
+      } else if (arr.length === 0) {
+        matchTag = false;
       } else {
-        if ((selectedTags as any).has("__NO_TAG__")) {
-          matchTag = arr.length === 0;
-          const otherTags = Array.from(selectedTags).filter((t: any) => t !== "__NO_TAG__");
-          if (otherTags.some((t: any) => arr.includes(t as any))) matchTag = true;
-        } else if (arr.length === 0) {
-          matchTag = false;
-        } else if (tagOpSelect.value === "AND") {
-          matchTag = Array.from(selectedTags).every((t: any) => arr.includes(t as any));
-        } else {
-          matchTag = Array.from(selectedTags).some((t: any) => arr.includes(t as any));
-        }
+        // Always use OR logic
+        matchTag = Array.from(selectedTags).some((t: any) => arr.includes(t as any));
       }
     }
     let matchColor = true;
     if (hasColorFilters) {
-      if (colorOpSelect.value === "NOT") matchColor = !(selectedColors as any).has(a.color);
-      else if (colorOpSelect.value === "AND") matchColor = selectedColors.size === 1 && (selectedColors as any).has(a.color);
-      else matchColor = (selectedColors as any).has(a.color);
+      // Always use OR logic
+      matchColor = (selectedColors as any).has(a.color);
     }
     return matchTag && matchColor;
   });
@@ -275,8 +256,7 @@ function filterAnnotations() {
       textInput.value = "";
       commentInput.value = "";
       datePresetSelect && (datePresetSelect.value = "all");
-      tagOpSelect.value = "OR";
-      colorOpSelect.value = "OR";
+      // Remove logic select resets
       setTimeout(() => filterAnnotations(), 0);
       return;
     }
@@ -290,7 +270,7 @@ function filterAnnotations() {
 
 function renderAnnotations() {
   annotationContainer.innerHTML = "";
-  const perRow = Math.min(3, parseInt(itemsPerRowInput.value, 10) || 1);
+  const perRow = Math.min(3, currentLayout || 1);
   annotationContainer.style.gridTemplateColumns = `repeat(${perRow}, 1fr)`;
   // 标记当前每行列数，供样式控制悬停信息开关
   try {
@@ -476,43 +456,39 @@ function renderBottomOptions() {
   colorsListContainer.innerHTML = "";
   const hasTagFilters = selectedTags.size > 0;
   const hasColorFilters = selectedColors.size > 0;
+  
+  // Always use OR logic
   const colorsBase = textResults.filter((a) => {
     if (!hasTagFilters) return true;
     const arr = asTagArray(a.tags);
-    if (tagOpSelect.value === "NOT") {
-      if ((selectedTags as any).has("__NO_TAG__")) return arr.length > 0;
-      return arr.every((t)=>!(selectedTags as any).has(t));
-    }
-    if (tagOpSelect.value === "AND") return Array.from(selectedTags).every((t:any)=>arr.includes(t as any));
     if ((selectedTags as any).has("__NO_TAG__")) return arr.length===0;
     return Array.from(selectedTags).some((t:any)=>arr.includes(t as any));
   });
+  
   const tagsBase = textResults.filter((a) => {
     if (!hasColorFilters) return true;
-    if (colorOpSelect.value === "NOT") return !(selectedColors as any).has(a.color);
-    if (colorOpSelect.value === "AND") return selectedColors.size === 1 && (selectedColors as any).has(a.color);
     return (selectedColors as any).has(a.color);
   });
-  const colorSource = colorOpSelect.value === "OR" ? colorsBase : combinedResults;
-  const tagSource   = tagOpSelect.value   === "OR" ? tagsBase   : combinedResults;
+  
+  const colorSource = colorsBase;
+  const tagSource = tagsBase;
   const colorsSet = new Set(colorSource.map((a:any)=>a.color).filter(Boolean));
   const tagsSet   = new Set<string>();
   tagSource.forEach((a:any)=>{ asTagArray(a.tags).forEach((t:string)=>tagsSet.add(t)); });
+  
   const noTagValue = "__NO_TAG__";
-  if (!(tagOpSelect.value === "NOT" && (selectedTags as any).has(noTagValue))) {
-    const noTagEl = document.createElement("span");
-    noTagEl.className = "tag-item";
-    (noTagEl as any).textContent = getString("noTag");
-    if (tagOpSelect.value !== "NOT" && (selectedTags as any).has(noTagValue)) noTagEl.classList.add("selected");
-    noTagEl.addEventListener("click", () => {
-      if ((selectedTags as any).has(noTagValue)) (selectedTags as any).delete(noTagValue);
-      else (selectedTags as any).add(noTagValue);
-      filterAnnotations();
-    });
-    tagsListContainer.appendChild(noTagEl);
-  }
+  const noTagEl = document.createElement("span");
+  noTagEl.className = "tag-item";
+  (noTagEl as any).textContent = getString("noTag");
+  if ((selectedTags as any).has(noTagValue)) noTagEl.classList.add("selected");
+  noTagEl.addEventListener("click", () => {
+    if ((selectedTags as any).has(noTagValue)) (selectedTags as any).delete(noTagValue);
+    else (selectedTags as any).add(noTagValue);
+    filterAnnotations();
+  });
+  tagsListContainer.appendChild(noTagEl);
+  
   Array.from(tagsSet).sort((a:any,b:any)=>String(a).localeCompare(String(b),"zh-CN")).forEach((tag:any) => {
-    if (tagOpSelect.value === "NOT" && (selectedTags as any).has(tag)) return;
     const tagEl = document.createElement("span");
     tagEl.className = "tag-item";
     (tagEl as any).textContent = tag;
@@ -524,8 +500,8 @@ function renderBottomOptions() {
     });
     tagsListContainer.appendChild(tagEl);
   });
+  
   Array.from(colorsSet).sort().forEach((col:any) => {
-    if (colorOpSelect.value === "NOT" && (selectedColors as any).has(col)) return;
     const colEl = document.createElement("div");
     colEl.className = "color-item";
     (colEl as any).style.backgroundColor = col;
@@ -772,11 +748,21 @@ async function removeTagFromAnnotation(itemID:number, tagToRemove:string, wrappe
 
 textInput.addEventListener("input", filterAnnotations);
 commentInput.addEventListener("input", filterAnnotations);
-itemsPerRowInput.addEventListener("change", renderAnnotations);
+
+// Setup layout toggle buttons
+const layoutButtons = itemsPerRowContainer.querySelectorAll('.layout-btn');
+layoutButtons.forEach((btn: any) => {
+  btn.addEventListener('click', () => {
+    layoutButtons.forEach((b: any) => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentLayout = parseInt(btn.dataset.layout);
+    renderAnnotations();
+  });
+});
+
 itemsPerPageSelect.addEventListener("change", () => { currentPage = 1; renderAnnotations(); });
 datePresetSelect.addEventListener("change", filterAnnotations);
-tagOpSelect.addEventListener("change", () => { selectedTags.clear(); filterAnnotations(); });
-colorOpSelect.addEventListener("change", () => { selectedColors.clear(); filterAnnotations(); });
+// Remove tagOpSelect and colorOpSelect listeners
 prevPageButton.addEventListener("click", () => { if (currentPage > 1) { currentPage--; renderAnnotations(); } });
 nextPageButton.addEventListener("click", () => { if (currentPage < totalPages) { currentPage++; renderAnnotations(); } });
 

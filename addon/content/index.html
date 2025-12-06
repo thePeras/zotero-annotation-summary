@@ -13,20 +13,6 @@
     <link rel="stylesheet" href="styles/index.css" />
   </head>
   <body>
-    <div class="container">
-      <h1 id="annotation-summary-title"></h1>
-
-      <!-- 顶部右侧：文件夹多选树下拉 -->
-      <div class="collections-top-right">
-        <label id="label-collection-filter"></label>
-        <div class="collections-dropdown">
-          <button id="collections-trigger" class="collections-trigger"></button>
-          <div id="collections-panel" class="collections-panel">
-            <div id="collections-tree" class="collections-tree"></div>
-          </div>
-        </div>
-      </div>
-
       <div class="controls">
         <div class="control-group">
           <label for="text-search" id="label-text-search"></label>
@@ -36,9 +22,26 @@
           <label for="comment-search" id="label-comment-search"></label>
           <input type="text" id="comment-search" placeholder="" />
         </div>
+        
+        <!-- 文件夹过滤 -->
+        <div class="control-group">
+          <label id="label-collection-filter"></label>
+          <div class="collections-dropdown">
+            <button id="collections-trigger" class="collections-trigger"></button>
+            <div id="collections-panel" class="collections-panel">
+              <div id="collections-tree" class="collections-tree"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 布局切换按钮 -->
         <div class="control-group">
           <label for="items-per-row" id="label-items-per-row"></label>
-          <input type="number" id="items-per-row" min="1" max="3" value="1" />
+          <div class="layout-toggle" id="items-per-row">
+            <button class="layout-btn active" data-layout="1">1</button>
+            <button class="layout-btn" data-layout="2">2</button>
+            <button class="layout-btn" data-layout="3">3</button>
+          </div>
         </div>
 
         <!-- "每页显示数量" 下拉菜单 -->
@@ -51,7 +54,7 @@
           </select>
         </div>
 
-        <!-- 仅保�?日期范围"下拉菜单 -->
+        <!-- 日期范围 -->
         <div class="control-group">
           <label for="date-preset" id="label-date-preset"></label>
           <select id="date-preset">
@@ -62,6 +65,18 @@
             <option value="30" id="date-preset-30"></option>
             <option value="365" id="date-preset-365"></option>
           </select>
+        </div>
+        
+        <!-- 颜色过滤 -->
+        <div class="control-group">
+          <label id="label-color-filter"></label>
+          <div class="colors-list" id="colors-list"></div>
+        </div>
+        
+        <!-- 标签过滤 -->
+        <div class="control-group">
+          <label id="label-tag-filter"></label>
+          <div class="tags-list" id="tags-list"></div>
         </div>
       </div>
 
@@ -128,45 +143,17 @@
 
       <div id="no-results" style="display: none"></div>
 
-      <div class="filters-container">
-        <div class="filter-group">
-          <label id="label-color-filter"></label>
-          <div class="colors-list" id="colors-list"></div>
-          <label for="color-op" id="label-color-op"></label>
-          <select id="color-op">
-            <option value="OR">OR</option>
-            <option value="AND">AND</option>
-            <option value="NOT">NOT</option>
-          </select>
+      <!-- 统计区域 - 移到顶部，移除容器 -->
+      <div class="stats-grid">
+        <div class="stats-box">
+          <h3 id="stats-color"></h3>
+          <div id="color-histogram"></div>
         </div>
-
-        <div class="filter-group">
-          <label id="label-tag-filter"></label>
-          <div class="tags-list" id="tags-list"></div>
-          <label for="tag-op" id="label-tag-op"></label>
-          <select id="tag-op">
-            <option value="OR">OR</option>
-            <option value="AND">AND</option>
-            <option value="NOT">NOT</option>
-          </select>
+        <div class="stats-box">
+          <h3 id="stats-tag"></h3>
+          <div id="tag-histogram"></div>
         </div>
       </div>
-
-      <!-- 统计�?-->
-      <div class="stats-container">
-        <h2 id="stats-title"></h2>
-        <div class="stats-grid">
-          <div class="stats-box">
-            <h3 id="stats-color"></h3>
-            <div id="color-histogram"></div>
-          </div>
-          <div class="stats-box">
-            <h3 id="stats-tag"></h3>
-            <div id="tag-histogram"></div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <script src="scripts/summary-ui.js"></script>
   </body>

@@ -29,28 +29,8 @@ body {
   min-height: 100vh;
 }
 
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  background-color: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  padding: 15px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #ccc;
-}
-
 h1 {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  text-align: center;
-  margin-bottom: 12px;
-  color: var(--primary-color);
-  font-weight: 600;
-  font-size: 1.3rem;
-  position: relative;
-  padding-bottom: 8px;
+  display: none; /* Hide title */
 }
 
 h2 {
@@ -67,7 +47,7 @@ h2 {
 /* ---------- 顶部控制区 ---------- */
 .controls {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
   margin-bottom: 15px;
   padding: 12px;
@@ -111,10 +91,42 @@ h2 {
   color: #95a5a6;
 }
 
+/* Layout toggle buttons */
+.layout-toggle {
+  display: flex;
+  gap: 4px;
+  background-color: #fff;
+  border: 1px solid var(--medium-gray);
+  border-radius: var(--border-radius);
+  padding: 2px;
+}
+
+.layout-btn {
+  flex: 1;
+  padding: 4px 8px;
+  border: none;
+  background-color: transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  transition: var(--transition);
+}
+
+.layout-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.layout-btn.active {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
 /* —— 多选树样式（文件夹） —— */
 .collections-dropdown {
   position: relative;
-  display: inline-block;
+  display: block;
+  width: 100%;
 }
 .collections-trigger {
   padding: 6px 10px;
@@ -122,7 +134,7 @@ h2 {
   border-radius: var(--border-radius);
   background-color: #fff;
   cursor: pointer;
-  min-width: 220px;
+  width: 100%;
   text-align: left;
   font-size: 0.9rem;
 }
@@ -167,20 +179,6 @@ h2 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-/* 右上角定位容器 */
-.collections-top-right {
-  position: absolute;
-  top: 12px;
-  right: 15px;
-  z-index: 15;
-}
-.collections-top-right label {
-  display: none;
-}
-.collections-top-right .collections-panel {
-  right: 0;
-  left: auto;
 }
 
 /* —— 可折叠的层级 —— */
@@ -447,15 +445,14 @@ h2 {
 
 .tag-item {
   background-color: white;
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 3px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   transition: var(--transition);
   border: 1px solid var(--medium-gray);
   font-weight: 400;
   color: #444;
-  position: relative;
 }
 
 .tag-item:hover {
@@ -468,31 +465,18 @@ h2 {
   border-color: #5680c3;
 }
 
-/* 排除逻辑下的标签样式，用红线表示 */
-.tag-item.excluded {
-  position: relative;
-}
-
-.tag-item.excluded::after {
-  content: "";
-  position: absolute;
-  left: 5%;
-  right: 5%;
-  bottom: 2px;
-  height: 2px;
-  background-color: red;
-  border-radius: 1px;
-}
+/* Remove excluded styles since we're removing the logic */
 
 .color-item {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: 2px solid white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: var(--transition);
   position: relative;
+  display: inline-block;
 }
 
 .color-item:hover {
@@ -507,44 +491,12 @@ h2 {
     0 0 0 3px var(--primary-color);
 }
 
-/* 排除逻辑下的颜色样式，用红线表示 */
-.color-item.excluded {
-  position: relative;
-}
-
-.color-item.excluded::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -4px;
-  height: 3px;
-  background-color: red;
-  border-radius: 1px;
-}
-
-.filter-group select {
-  padding: 6px 10px;
-  border: 1px solid var(--medium-gray);
-  border-radius: var(--border-radius);
-  font-size: 0.85rem;
-  background-color: white;
-  min-width: 90px;
-}
-
 /* ---------- 统计区域 ---------- */
-.stats-container {
-  margin-top: 20px;
-  background: #fafafa;
-  border-radius: var(--border-radius);
-  padding: 15px;
-  border: 1px solid var(--medium-gray);
-}
-
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 15px;
+  margin-top: 20px;
 }
 
 .stats-box {
