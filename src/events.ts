@@ -72,7 +72,7 @@ export function openHelloZoteroTab(fileUri: string) {
   try {
     const win = Zotero.getMainWindow();
     const doc = win.document as any;
-    const iconUrl = `chrome://${config.addonName}/content/icons/favicon@0.5x.png`;
+    const iconUrl = `chrome://${config.addonName}/content/icons/favicon.png`;
     // 等一帧，等待 Tab DOM 完全渲染
     setTimeout(() => {
       try {

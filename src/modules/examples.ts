@@ -138,7 +138,7 @@ export class UIExampleFactory {
 
   @example
   static registerRightClickMenuItem() {
-    const menuIcon = `chrome://${addon.data.config.addonRef}/content/icons/favicon@0.5x.png`;
+    const menuIcon = `chrome://${addon.data.config.addonRef}/content/icons/favicon.png`;
     // item menuitem with icon
     ztoolkit.Menu.register("item", {
       tag: "menuitem",

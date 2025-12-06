@@ -44,7 +44,7 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
     btn.setAttribute("id", "annotation-summary-toolbarbutton");
     btn.setAttribute("tooltiptext", getString("menuitem-open-annotation-summary"));
     if (!template) btn.setAttribute("class", "zotero-tb-button");
-    ["command","oncommand","onclick","onmousedown","type","wantdropmarker"].forEach((a)=>btn.removeAttribute(a));
+    ["command", "oncommand", "onclick", "onmousedown", "type", "wantdropmarker"].forEach((a) => btn.removeAttribute(a));
     btn.querySelector("menupopup")?.remove();
     btn.querySelector("dropmarker")?.remove();
 
@@ -52,17 +52,17 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
     const setIcon16 = (button: any, url: string) => {
       const img = new (win as any).Image();
       img.onload = () => {
-        const c: any = win.document.createElementNS("http://www.w3.org/1999/xhtml","canvas");
+        const c: any = win.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
         c.width = c.height = 16;
         const ctx = c.getContext("2d");
         ctx?.drawImage(img, 0, 0, 16, 16);
         (button as any).style.listStyleImage = `url(${c.toDataURL("image/png")})`;
         const inner = button.querySelector("image.toolbarbutton-icon");
-        if (inner) { inner.removeAttribute("type"); inner.setAttribute("width","16"); inner.setAttribute("height","16"); }
+        if (inner) { inner.removeAttribute("type"); inner.setAttribute("width", "16"); inner.setAttribute("height", "16"); }
       };
       img.src = url;
     };
-    setIcon16(btn, `chrome://${config.addonRef}/content/icons/favicon@0.5x.png`);
+    setIcon16(btn, `chrome://${config.addonRef}/content/icons/favicon.png`);
 
     btn.addEventListener("command", async () => {
       const fileUri = await extractAllAnnotations();
